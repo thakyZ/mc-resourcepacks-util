@@ -1,0 +1,88 @@
+#:schema ./.vscode/pyproject.schema.json
+[tool.poetry]
+name = "mc-resourcepacks-util"
+version = "1.0.0"
+description = "A utility for minecraft to better customize resource packs than the in-game minecraft ui."
+authors = ["thakyZ <950594+thakyZ@users.noreply.github.com>"]
+# Uncomment when no longer maintained by author(s).
+# maintainers = []
+license = "MIT"
+readme = "README.md"
+keywords = ["cli", "gui", "minecraft", "resourcepack", "utility"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Natural Language :: English",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Utilities",
+  "Topic :: Games/Entertainment",
+]
+include = ["LICENSE","README.md"]
+repository = "https://github.com/thakyZ/mc-resourcepacks-util"
+homepage = "https://github.com/thakyZ/mc-resourcepacks-util#README"
+documentation = "https://github.com/thakyZ/mc-resourcepacks-util/blob/main/docs/index.md"
+packages = [
+  # CLI packager definitions.
+  { include = "shared", from = "src", to = "mc_resourcepacks_util-cli" },
+  { include = "cli",    from = "src", to = "mc_resourcepacks_util-cli" },
+  # GUI packager definitions.
+  { include = "shared", from = "src", to = "mc_resourcepacks_util-gui" },
+  { include = "gui",    from = "src", to = "mc_resourcepacks_util-gui" }
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/thakyZ/mc-resourcepacks-util/issues"
+Changelog = "https://github.com/thakyZ/mc-resourcepacks-util/blob/master/CHANGELOG.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+chardet = "^5.2.0"
+rich = "^13.7.1"
+
+[tool.poetry.group.gui.dependencies]
+pyqt6 = "^6.6.1"
+
+[tool.poetry.group.cli.dependencies]
+rich = "^13.7.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+pylint = "^3.1.0"
+black = "^24.2.0"
+isort = "^5.13.2"
+
+[tool.poetry.scripts]
+mc_resourcepacks_util_cli = "mc_resourcepacks_util-cli.__init__:main"
+mc_resourcepacks_util_gui = "mc_resourcepacks_util-gui.__init__:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = [
+  ".vscode/tasks",
+  "src/shared",
+  "src/cli",
+  "src/gui"
+]
+exclude = [
+    "**/__pycache__",
+    "**/.mypy_cache"
+]
+ignore = [".env/**"]
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.12"
+
+executionEnvironments = [
+  { root = "src/gui", pythonVersion = "3.12", extraPaths = [ "src/shared" ] },
+  { root = "src/cli", pythonVersion = "3.12", extraPaths = [ "src/shared" ] },
+  { root = ".vscode/tasks", pythonVersion = "3.12" },
+  { root = "src" }
+]

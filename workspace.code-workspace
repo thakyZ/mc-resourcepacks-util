@@ -1,0 +1,15 @@
+{
+	// cSpell:ignore prismlauncher
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../../../scoop/apps/prismlauncher/current/instances/All the Mods 9 - ATM9"
+		},
+		{
+			"path": "../../../../../scoop/apps/prismlauncher/current/instances/Test Build"
+		}
+	],
+	"settings": {}
+}
