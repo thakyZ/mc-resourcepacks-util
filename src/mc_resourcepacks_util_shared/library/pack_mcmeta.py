@@ -4,6 +4,7 @@
 
 from typing import Any, Generator, Literal
 
+
 class PackMcMeta:
     """Data from the pack.mcmeta file.
 
@@ -30,6 +31,7 @@ class PackMcMeta:
     }
     ```
     """
+
     pack_format: int = -1
     description: str = ""
     is_valid: bool = False
@@ -37,7 +39,11 @@ class PackMcMeta:
     def __init__(self, data: dict[str, Any]) -> None:
         if "pack" in data.keys():
             pack: dict[str, Any] = data["pack"]
-            if "pack_format" in pack.keys() and isinstance(pack["pack_format"], int) and pack["pack_format"] > 0:
+            if (
+                "pack_format" in pack.keys()
+                and isinstance(pack["pack_format"], int)
+                and pack["pack_format"] > 0
+            ):
                 self.pack_format = pack["pack_format"]
                 self.is_valid |= True
             if "description" in pack.keys() and isinstance(pack["description"], str):
@@ -47,11 +53,21 @@ class PackMcMeta:
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, PackMcMeta):
             return False
-        return (other.description == self.description and
-                other.pack_format == self.pack_format and
-                other.is_valid == self.is_valid)
+        return (
+            other.description == self.description
+            and other.pack_format == self.pack_format
+            and other.is_valid == self.is_valid
+        )
 
-    def __rich_repr__(self) -> Generator[tuple[Literal["pack_format"], int] | tuple[Literal["description"], str] | tuple[Literal["is_valid"], bool], Any, None]:
+    def __rich_repr__(
+        self,
+    ) -> Generator[
+        tuple[Literal["pack_format"], int]
+        | tuple[Literal["description"], str]
+        | tuple[Literal["is_valid"], bool],
+        Any,
+        None,
+    ]:
         yield "pack_format", self.pack_format
         yield "description", self.description
         yield "is_valid", self.is_valid

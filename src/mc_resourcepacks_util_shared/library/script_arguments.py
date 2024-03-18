@@ -9,7 +9,7 @@ from types import NotImplementedType
 from typing import Any
 
 
-class ScriptArguments():
+class ScriptArguments:
     """A custom extensions of the ``argparse`` ``Namespace`` class."""
 
     @property
@@ -51,19 +51,43 @@ class ScriptArguments():
     def __init__(self, namespace: Namespace) -> None:
         for key, value in namespace.__dict__.items():
             self.__setattr__(key, value)
-        if self.__contains__("dir") and self.dir is not None and isinstance(self.dir, str | Path):
+        if (
+            self.__contains__("dir")
+            and self.dir is not None
+            and isinstance(self.dir, str | Path)
+        ):
             self._minecraft_folder: Path = self.__get_minecraft_dir__(self.dir)
             self._options_file: Path = Path(self.minecraft_folder, "options.txt")
-            self._resourcepacks_folder: Path = Path(self.minecraft_folder, "resourcepacks")
+            self._resourcepacks_folder: Path = Path(
+                self.minecraft_folder, "resourcepacks"
+            )
             self._config_folder: Path
-            if self.__contains__("compile") and self.compile is True and self.compile_dir is not None and isinstance(self.compile_dir, str | Path):
-                self._config_folder = self.__determine_config_dir__(_dir=self.compile_dir)
-            elif self.__contains__("decompile") and self.decompile is True and self.decompile_dir is not None and isinstance(self.decompile_dir, str | Path):
-                self._config_folder = self.__determine_config_dir__(_dir=self.decompile_dir)
+            if (
+                self.__contains__("compile")
+                and self.compile is True
+                and self.compile_dir is not None
+                and isinstance(self.compile_dir, str | Path)
+            ):
+                self._config_folder = self.__determine_config_dir__(
+                    _dir=self.compile_dir
+                )
+            elif (
+                self.__contains__("decompile")
+                and self.decompile is True
+                and self.decompile_dir is not None
+                and isinstance(self.decompile_dir, str | Path)
+            ):
+                self._config_folder = self.__determine_config_dir__(
+                    _dir=self.decompile_dir
+                )
             else:
-                self._config_folder = self.__determine_config_dir__(path=self.minecraft_folder)
+                self._config_folder = self.__determine_config_dir__(
+                    path=self.minecraft_folder
+                )
 
-    def __determine_config_dir__(self, path: Path | None = None, _dir: str | Path | None = None) -> Path:
+    def __determine_config_dir__(
+        self, path: Path | None = None, _dir: str | Path | None = None
+    ) -> Path:
         # pylint: disable-next=R1702
         if path is not None:
             if path.parent.name not in ["Local", "LocalLow", "Roaming"]:
@@ -75,7 +99,9 @@ class ScriptArguments():
             if not Path(os.getcwd(), "resourcepacks").exists():
                 return Path(os.getcwd(), "resourcepacks")
             if not Path(os.path.dirname(os.path.realpath(__file__)), "resourcepacks"):
-                return Path(os.path.dirname(os.path.realpath(__file__)), "resourcepacks")
+                return Path(
+                    os.path.dirname(os.path.realpath(__file__)), "resourcepacks"
+                )
         if _dir is not None:
             return Path(_dir)
         raise FileNotFoundError("Path specified was not a valid minecraft directory.")

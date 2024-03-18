@@ -12,6 +12,20 @@ files = [
 ]
 
 [[package]]
+name = "autopep8"
+version = "2.1.0"
+description = "A tool that automatically formats Python code to conform to the PEP 8 style guide"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "autopep8-2.1.0-py2.py3-none-any.whl", hash = "sha256:2bb76888c5edbcafe6aabab3c47ba534f5a2c2d245c2eddced4a30c4b4946357"},
+    {file = "autopep8-2.1.0.tar.gz", hash = "sha256:1fa8964e4618929488f4ec36795c7ff12924a68b8bf01366c094fc52f770b6e7"},
+]
+
+[package.dependencies]
+pycodestyle = ">=2.11.0"
+
+[[package]]
 name = "black"
 version = "24.2.0"
 description = "The uncompromising code formatter."
@@ -440,4 +454,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "0f3197dc52b425ffc6f42b9800597bb87032aaf213955cd6a4bb16b3d50364cd"
+content-hash = "286dc03af93df08c12d517b058bafccfc7eb2c6b64f6cb1a64b13f4a2187d42b"

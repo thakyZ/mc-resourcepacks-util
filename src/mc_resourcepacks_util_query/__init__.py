@@ -20,14 +20,54 @@ def main() -> None:
     """_summary_"""
     cwd: str = os.getcwd()
 
-    parser: ArgumentParser = ArgumentParser(prog="Resourcepack Query Tools", description="Queries minecraft assets folders for files that match the query.", allow_abbrev=True)
-    parser.add_argument("instance",                                                   type=str,            help="The first target directory.")  # noqa: E241
-    parser.add_argument("query",                                                      type=str,            help="The relative, full, or partial path to search")  # noqa: E241
-    parser.add_argument("--resourcepacks",          "-r", dest="query_resourcepacks", action="store_true", help="Uses the resource packs folder")  # noqa: E241
-    parser.add_argument("--mods",                   "-m", dest="query_mods",          action="store_true", help="Uses the resource packs folder")  # noqa: E241
-    parser.add_argument("--emissive_check",         "-e", dest="is_emissive_check",   action="store_true", help="Emissive Suffix Consistency Check. Checks to see if all files are matching consistency with the specific query suffix.")  # noqa: E241
-    parser.add_argument("--instances_dir", "--dir", "-d", dest="instances_dir",       type=str,            help="Specifies a custom instances directory.", default="")  # noqa: E241
-    parser.add_argument("--regex",                  "-R", dest="is_regex",            action="store_true", help="Specifies that the query is using regex.")  # noqa: E241
+    parser: ArgumentParser = ArgumentParser(
+        prog="Resourcepack Query Tools",
+        description="Queries minecraft assets folders for files that match the query.",
+        allow_abbrev=True,
+    )
+    parser.add_argument(
+        "instance", type=str, help="The first target directory."
+    )  # noqa: E241
+    parser.add_argument(
+        "query", type=str, help="The relative, full, or partial path to search"
+    )  # noqa: E241
+    parser.add_argument(
+        "--resourcepacks",
+        "-r",
+        dest="query_resourcepacks",
+        action="store_true",
+        help="Uses the resource packs folder",
+    )  # noqa: E241
+    parser.add_argument(
+        "--mods",
+        "-m",
+        dest="query_mods",
+        action="store_true",
+        help="Uses the resource packs folder",
+    )  # noqa: E241
+    parser.add_argument(
+        "--emissive_check",
+        "-e",
+        dest="is_emissive_check",
+        action="store_true",
+        help="Emissive Suffix Consistency Check. Checks to see if all files are matching consistency with the specific query suffix.",
+    )  # noqa: E241
+    parser.add_argument(
+        "--instances_dir",
+        "--dir",
+        "-d",
+        dest="instances_dir",
+        type=str,
+        help="Specifies a custom instances directory.",
+        default="",
+    )  # noqa: E241
+    parser.add_argument(
+        "--regex",
+        "-R",
+        dest="is_regex",
+        action="store_true",
+        help="Specifies that the query is using regex.",
+    )  # noqa: E241
 
     args: Namespace = parser.parse_args()
 
@@ -36,7 +76,9 @@ def main() -> None:
     if args.is_emissive_check:
         emissive_check = "emissive"
 
-    query_builder: QueryBuilder = QueryBuilder(query=args.query, regex=args.is_regex, parameter=emissive_check)
+    query_builder: QueryBuilder = QueryBuilder(
+        query=args.query, regex=args.is_regex, parameter=emissive_check
+    )
 
     path_one: Path = Path()
 

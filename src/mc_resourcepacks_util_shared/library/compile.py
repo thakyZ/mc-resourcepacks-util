@@ -7,8 +7,8 @@ from pathlib import Path
 import tempfile
 from typing import Any
 
+from .utils import list_has
 from .script_arguments import ScriptArguments
-
 from .logger import pprint, quit_with_error
 from .resourcepack import ResourcePack
 from .dir_file_utils import check_if_dir_exists_create
@@ -33,7 +33,9 @@ def json_default(obj: Any) -> Any:
     raise TypeError(f"Type of obj is not a valid type got, {type(obj)}.")
 
 
-def compile_with_save(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]) -> None:
+def compile_with_save(
+    args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]
+) -> None:
     """Compiles the resourcepacks selected in ``enabled.txt`` and writes them to ``options.txt``.
 
     Args:
@@ -47,7 +49,14 @@ def compile_with_save(args: ScriptArguments, enabled: list[ResourcePack], incomp
         with args.options_file.open(mode="r+", encoding="utf8") as mc_options_source:
             try:
                 # make a hidden tempfile to stage your changes in
-                with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", prefix=".", dir=args.minecraft_folder, encoding="utf8", delete=False) as mc_options_target:
+                with tempfile.NamedTemporaryFile(
+                    mode="w",
+                    suffix=".txt",
+                    prefix=".",
+                    dir=args.minecraft_folder,
+                    encoding="utf8",
+                    delete=False,
+                ) as mc_options_target:
                     # iterate over lines in the source file (each line ends with \n)
                     for line in mc_options_source.readlines():
                         if line.startswith("resourcePacks:"):
@@ -57,7 +66,9 @@ def compile_with_save(args: ScriptArguments, enabled: list[ResourcePack], incomp
                         elif line.startswith("incompatibleResourcePacks:"):
                             # do any edits here, and then call target.write
                             temp_json = ResourcePack.from_list(incompatible)
-                            mc_options_target.write(f"incompatibleResourcePacks:{temp_json}\n")
+                            mc_options_target.write(
+                                f"incompatibleResourcePacks:{temp_json}\n"
+                            )
                         else:
                             mc_options_target.write(line)
                     mc_options_source.close()
@@ -77,7 +88,12 @@ def compile_with_save(args: ScriptArguments, enabled: list[ResourcePack], incomp
         quit_with_error(file_not_found_error)
 
 
-def compile_without_save(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack], minimal: bool = False) -> str:
+def compile_without_save(
+    args: ScriptArguments,
+    enabled: list[ResourcePack],
+    incompatible: list[ResourcePack],
+    minimal: bool = False,
+) -> str:
     """Compiles the resourcepacks selected in ``enabled.txt`` and writes them to ``options.txt``
 
     Args:
@@ -92,7 +108,9 @@ def compile_without_save(args: ScriptArguments, enabled: list[ResourcePack], inc
     new_output: str = ""
     temp_json: str = ""
 
-    with Path(os.path.realpath(args.dir), "options.txt").open("r", encoding="utf8") as mc_options_source:
+    with Path(os.path.realpath(args.dir), "options.txt").open(
+        "r", encoding="utf8"
+    ) as mc_options_source:
         try:
             for line in mc_options_source.readlines():
                 if line.startswith("resourcePacks:"):
@@ -122,16 +140,20 @@ def get_enabled_resourcepacks(args: ScriptArguments) -> list[ResourcePack]:
         list[ResourcePack]: _description_.
     """
     enabled: list[ResourcePack] = []
-    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(mode="r+", encoding="utf8") as enabled_file:
+    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(
+        mode="r+", encoding="utf8"
+    ) as enabled_file:
         for item in enabled_file.readlines():
             new_item: str = item.replace("\n", "")
-            if new_item != "" and item not in enabled:
+            if new_item != "" and list_has(enabled, item):
                 enabled.append(ResourcePack(new_item, args=args))
         enabled_file.close()
     return enabled
 
 
-def compile_resourcepacks(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]) -> None:
+def compile_resourcepacks(
+    args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]
+) -> None:
     """Compiles all resource packs in the ``<dir>/../resource_packs/*.txt`` file into the ``<dir>/options.txt`` file.
 
     Args:

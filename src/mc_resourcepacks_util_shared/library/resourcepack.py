@@ -107,11 +107,10 @@ class ResourcePack():
 
         list_config_list: list[str] = config_list.removeprefix("[\"").removesuffix("\"]").split("\",\"")
         for _, pack in enumerate(list_config_list):
-            if isinstance(pack, str):
-                if built_in_only and not pack.startswith("file"):
-                    resourcepacks.append(ResourcePack(pack, args=args))
-                elif not built_in_only:
-                    resourcepacks.append(ResourcePack(pack, args=args))
+            if built_in_only and not pack.startswith("file"):
+                resourcepacks.append(ResourcePack(pack, args=args))
+            elif not built_in_only:
+                resourcepacks.append(ResourcePack(pack, args=args))
         return resourcepacks
 
     @staticmethod

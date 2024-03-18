@@ -6,7 +6,9 @@ from .library.minecraft_version import MinecraftVersion
 from .library.resourcepack import ResourcePack
 
 
-def find_from_missing(enabled: list[ResourcePack], all_packs: list[ResourcePack]) -> list[ResourcePack]:
+def find_from_missing(
+    enabled: list[ResourcePack], all_packs: list[ResourcePack]
+) -> list[ResourcePack]:
     """Gets the list of disabled resourcepacks from the list of enabled resourcepacks and what is in the ``resourcepacks`` folder.
 
     Args:
@@ -23,7 +25,9 @@ def find_from_missing(enabled: list[ResourcePack], all_packs: list[ResourcePack]
     return disabled
 
 
-def filter_only_incompatible(packs: list[ResourcePack], mc_version: MinecraftVersion) -> list[ResourcePack]:
+def filter_only_incompatible(
+    packs: list[ResourcePack], mc_version: MinecraftVersion
+) -> list[ResourcePack]:
     # TODO: Add description for method returns/raises/arguments.
     """Filter each pack for a resourcepack that is incompatible.
 

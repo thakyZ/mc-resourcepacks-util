@@ -19,7 +19,7 @@ from .logger import pprint
 from .errors import EnvironmentVariableNotFoundError
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # pylint: disable-next=R0903
@@ -29,6 +29,7 @@ class MyTypeChecker(Generic[T]):
     Args:
         Generic (T): A generic type with it's generic type parameters.
     """
+
     def is_right_type(self, obj: Any | None) -> bool:
         """Returns if the type of ``obj`` is a the correct type of this type checker.
 
@@ -75,6 +76,7 @@ def list_has(_list: list[Any], query: Any) -> bool:
     # NOTE: These are imported while not on the top level, because of import recursion.
     # pylint: disable-next=C0415
     from .pack_mcmeta import PackMcMeta
+
     # pylint: disable-next=C0415
     from .resourcepack import ResourcePack
 
@@ -117,7 +119,7 @@ def escape_config_chars(_json: str) -> str:
     """
     output: str = _json
     output = output.replace("!", r"\u0021")
-    output = output.replace("\"", r"\u0022")
+    output = output.replace('"', r"\u0022")
     output = output.replace("#", r"\u0023")
     output = output.replace("$", r"\u0024")
     output = output.replace("%", r"\u0025")
@@ -140,7 +142,7 @@ def unescape_config_chars(_json: str) -> str:
     """
     output: str = _json
     output = output.replace(r"\u0021", "!")
-    output = output.replace(r"\u0022", "\"")
+    output = output.replace(r"\u0022", '"')
     output = output.replace(r"\u0023", "#")
     output = output.replace(r"\u0024", "$")
     output = output.replace(r"\u0025", "%")
@@ -152,11 +154,18 @@ def unescape_config_chars(_json: str) -> str:
     return output
 
 
-_ReadWriteMode = Literal["w", "w+", "wb", "wb+", "r", "r+", "rb", "rb+", "a", "a+", "ab", "ab+"]
+_ReadWriteMode = Literal[
+    "w", "w+", "wb", "wb+", "r", "r+", "rb", "rb+", "a", "a+", "ab", "ab+"
+]
 _ReadWriteModeBasic = Literal["w", "r"]
 
 
-def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r", zip_file: ZipFile | None = None, force_zip64: bool = False) -> IO[Any]:
+def open_file(
+    file: Path | str,
+    mode: _ReadWriteMode | _ReadWriteModeBasic = "r",
+    zip_file: ZipFile | None = None,
+    force_zip64: bool = False,
+) -> IO[Any]:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
     """_summary_
@@ -174,7 +183,10 @@ def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r"
     Returns:
         IO[Any]: _description_
     """
-    def simplify_mode(mode: _ReadWriteMode | _ReadWriteModeBasic) -> _ReadWriteModeBasic:
+
+    def simplify_mode(
+        mode: _ReadWriteMode | _ReadWriteModeBasic,
+    ) -> _ReadWriteModeBasic:
         """Simplifies the mode parameter to be basic for zip file reading/writing.
 
         Args:
@@ -203,15 +215,23 @@ def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r"
         raw_data = tmp_read_zip.read()
         tmp_read_zip.close()
     encoding = chardet.detect(raw_data)["encoding"]
-    zip_file_stream: IO[bytes] = zip_file.open(name=file, mode=simplify_mode(mode), force_zip64=force_zip64)
+    zip_file_stream: IO[bytes] = zip_file.open(
+        name=file, mode=simplify_mode(mode), force_zip64=force_zip64
+    )
     if encoding is None:
-        raise TypeError(f"Encoding type was not found for the file \"{file}\".")
-    decoded_file_stream: IO[Any] = io.StringIO(zip_file_stream.read().decode(encoding=encoding))
+        raise TypeError(f'Encoding type was not found for the file "{file}".')
+    decoded_file_stream: IO[Any] = io.StringIO(
+        zip_file_stream.read().decode(encoding=encoding)
+    )
     return decoded_file_stream
 
 
-_LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(r"Extra data: line (\d+) column (\d+) \(char (\d+)\)$", re.MULTILINE)
-_MULTI_LINE_ENSURE_REGEX: Pattern[str] = re.compile(r"^(?: |\t)*\"[^\r\n]+\": \"((?:[^\b\"]|\\.\r?\n)*)\",?$", re.MULTILINE)
+_LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(
+    r"Extra data: line (\d+) column (\d+) \(char (\d+)\)$", re.MULTILINE
+)
+_MULTI_LINE_ENSURE_REGEX: Pattern[str] = re.compile(
+    r"^(?: |\t)*\"[^\r\n]+\": \"((?:[^\b\"]|\\.\r?\n)*)\",?$", re.MULTILINE
+)
 
 
 def try_decode_json_force(data: str) -> dict[str, Any]:
@@ -293,28 +313,42 @@ def transform_env_variables(value: str) -> str:
 
     env_var: str | None = None
 
-    while unix_matches is not None or pwsh_matches is not None or batch_matches is not None:
+    while (
+        unix_matches is not None
+        or pwsh_matches is not None
+        or batch_matches is not None
+    ):
         if unix_matches is not None:
             if os.name == "nt" and unix_matches.groups()[0] == "$HOME":
-                output = value.replace(unix_matches.groups()[0], os.path.expanduser("~"))
+                output = value.replace(
+                    unix_matches.groups()[0], os.path.expanduser("~")
+                )
             elif os.name != "nt":
                 env_var = os.environ.get(unix_matches.groups()[0].replace("$", ""))
                 if env_var is not None:
                     output = value.replace(unix_matches.groups()[0], env_var)
                 else:
-                    raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{unix_matches.groups()[0]}\" was not found on the system.")
+                    raise EnvironmentVariableNotFoundError(
+                        f'Environment variable by key, "{unix_matches.groups()[0]}" was not found on the system.'
+                    )
         if pwsh_matches is not None:
             env_var = os.environ.get(pwsh_matches.groups()[0].replace("$env:", ""))
             if env_var is not None:
                 output = value.replace(pwsh_matches.groups()[0], env_var)
             else:
-                raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{pwsh_matches.groups()[0]}\" was not found on the system.")
+                raise EnvironmentVariableNotFoundError(
+                    f'Environment variable by key, "{pwsh_matches.groups()[0]}" was not found on the system.'
+                )
         if batch_matches is not None:
-            env_var = os.environ.get(batch_matches.groups()[0].removeprefix("%").removesuffix("%"))
+            env_var = os.environ.get(
+                batch_matches.groups()[0].removeprefix("%").removesuffix("%")
+            )
             if env_var is not None:
                 output = value.replace(batch_matches.groups()[0], env_var)
             else:
-                raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{batch_matches.groups()[0]}\" was not found on the system.")
+                raise EnvironmentVariableNotFoundError(
+                    f'Environment variable by key, "{batch_matches.groups()[0]}" was not found on the system.'
+                )
         unix_matches = unix_regex.search(output)
         pwsh_matches = pwsh_regex.search(output)
         batch_matches = batch_regex.search(output)

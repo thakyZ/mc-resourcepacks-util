@@ -1,27 +1,29 @@
 {
-  "python.defaultInterpreterPath": "./.env/Scripts/python.exe",
-  "python.analysis.typeCheckingMode": "standard",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.env/Scripts/python.exe",
+  "python.analysis.typeCheckingMode": "strict",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnusedImport": false
   },
   "python.REPL.enableREPLSmartSend": false,
-  "python.analysis.typeshedPaths": [
-    ".venv/Lib/site-packages"
-  ],
+  "python.poetryPath": "${workspaceFolder}/.env/Scripts/poetry.exe",
+  "python.analysis.autoSearchPaths": true,
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.analysis.indexing": true,
+  "python.analysis.diagnosticMode": "workspace",
   "evenBetterToml.schema.associations": {
-    "pyproject\\.toml": "https://gist.github.com/thakyZ/794efc5003ad437d387f6e75fefcbacc/pyproject.json"
-    // "pyproject\\.toml": "file:///${workspaceFolder}/.vscode/pyproject.schema.json"
+    "pyproject\\.toml": "https://gist.github.com/thakyZ/794efc5003ad437d387f6e75fefcbacc/pyproject.json",
+    // "pyproject\\.toml": "file:///${workspaceFolder}/.vscode/pyproject.schema.json",
   },
   "pylint.interpreter": [
     "${workspaceFolder}/.env/Scripts/python.exe",
   ],
-  "pylint.args": [
-    "--disable=C0301,W0611"
-  ],
+  "pylint.cwd": "${workspaceFolder}/src",
   "pylint.path": [
     "${workspaceFolder}/.env/Scripts/python.exe",
     "-m",
-    "pylint"
+    "poetry",
+    "run",
+    "pylint",
   ],
   "black-formatter.interpreter": [
     "${workspaceFolder}/.env/Scripts/python.exe",
@@ -29,7 +31,9 @@
   "black-formatter.path": [
     "${workspaceFolder}/.env/Scripts/python.exe",
     "-m",
-    "black"
+    "poetry",
+    "run",
+    "black",
   ],
   "isort.interpreter": [
     "${workspaceFolder}/.env/Scripts/python.exe",
@@ -37,7 +41,9 @@
   "isort.path": [
     "${workspaceFolder}/.env/Scripts/python.exe",
     "-m",
-    "isort"
+    "poetry",
+    "run",
+    "isort",
   ],
   "mypy-type-checker.interpreter": [
     "${workspaceFolder}/.env/Scripts/python.exe",
@@ -45,6 +51,26 @@
   "mypy-type-checker.path": [
     "${workspaceFolder}/.env/Scripts/python.exe",
     "-m",
-    "mypy"
+    "poetry",
+    "run",
+    "mypy",
+  ],
+  "flake8.interpreter": [
+    "${workspaceFolder}/.env/Scripts/python.exe",
+  ],
+  "flake8.path": [
+    "${workspaceFolder}/.env/Scripts/python.exe",
+    "-m",
+    "poetry",
+    "run",
+    "flake8",
+  ],
+  "autopep8.interpreter": [
+    "${workspaceFolder}/.env/Scripts/python.exe",
+  ],
+  "autopep8.path": [
+    "${workspaceFolder}/.env/Scripts/python.exe",
+    "-m",
+    "autopep8",
   ],
 }

@@ -14,7 +14,9 @@ from .logger import pprint
 from .dir_file_utils import check_if_dir_exists_create
 
 
-def decompile_resourcepacks(args: ScriptArguments, enabled: list[ResourcePack], disabled: list[ResourcePack]) -> None:
+def decompile_resourcepacks(
+    args: ScriptArguments, enabled: list[ResourcePack], disabled: list[ResourcePack]
+) -> None:
     """Decompiles the resourcepacks selected in ``options.txt``
 
     Args:
@@ -26,11 +28,15 @@ def decompile_resourcepacks(args: ScriptArguments, enabled: list[ResourcePack], 
     for item in enabled:
         if "Â§" in item.config_string:
             pprint(item)
-    with Path(os.path.join(os.path.realpath(args.config_folder), "enabled.txt")).open("wt+", -1, "utf8") as enabled_file:
+    with Path(os.path.join(os.path.realpath(args.config_folder), "enabled.txt")).open(
+        "wt+", -1, "utf8"
+    ) as enabled_file:
         for item in enabled:
             enabled_file.write(f"{item.config_string}\n")
         enabled_file.close()
-    with Path(os.path.join(os.path.realpath(args.config_folder), "disabled.txt")).open("wt+", -1, "utf8") as disabled_file:
+    with Path(os.path.join(os.path.realpath(args.config_folder), "disabled.txt")).open(
+        "wt+", -1, "utf8"
+    ) as disabled_file:
         for item in disabled:
             disabled_file.write(f"{item.config_string}\n")
         disabled_file.close()

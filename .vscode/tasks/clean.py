@@ -2,7 +2,7 @@
 
 """A module to clean temporary python cache directories/files."""
 
-#region DO NOT EDIT THIS REGION
+# region DO NOT EDIT THIS REGION
 import os
 from os import PathLike
 import sys
@@ -10,18 +10,15 @@ from typing import Callable, Any, TypeAlias, NoReturn, Literal
 from pathlib import Path
 import shutil
 from rich import print as pprint
-#endregion
 
-#region CONFIG REGION
-DIRECTORIES_TO_REMOVE: list[str] = [
-    "__pycache__",
-    ".mypy_cache"
-]
-FILE_TO_REMOVE: list[str] = [
-]
-#endregion
+# endregion
 
-#region DO NOT EDIT THIS REGION
+# region CONFIG REGION
+DIRECTORIES_TO_REMOVE: list[str] = ["__pycache__", ".mypy_cache"]
+FILE_TO_REMOVE: list[str] = []
+# endregion
+
+# region DO NOT EDIT THIS REGION
 _OnExcCallback: TypeAlias = Callable[[Callable[..., Any], str, Exception], object]
 StrOrBytesPath: TypeAlias = str | bytes | PathLike[str] | PathLike[bytes] | Path
 FileSystemTypes: TypeAlias = Literal["file", "directory", "link", "hidden", "root"]
@@ -29,7 +26,13 @@ FileSystemTypes: TypeAlias = Literal["file", "directory", "link", "hidden", "roo
 
 class FileTypeError(Exception):
     """Defines a custom error type that gets raised when the type of file/directory is unexpected."""
-    def __init__(self, expected_type: FileSystemTypes, gotten_type: FileSystemTypes | None = None, msg: str | None = None) -> None:
+
+    def __init__(
+        self,
+        expected_type: FileSystemTypes,
+        gotten_type: FileSystemTypes | None = None,
+        msg: str | None = None,
+    ) -> None:
         self.message: str | None = msg
         self.expected_type: FileSystemTypes = expected_type
         self.gotten_type: FileSystemTypes | None = gotten_type
@@ -67,13 +70,19 @@ def on_error(_: Callable[..., Any], message: str, exception: Exception) -> objec
     return "soup"
 
 
-_use_fd_functions: bool = ({os.open, os.stat, os.unlink, os.rmdir} <=
-                            os.supports_dir_fd and
-                            os.scandir in os.supports_fd and
-                            os.stat in os.supports_follow_symlinks)
+_use_fd_functions: bool = (
+    {os.open, os.stat, os.unlink, os.rmdir} <= os.supports_dir_fd
+    and os.scandir in os.supports_fd
+    and os.stat in os.supports_follow_symlinks
+)
 
 
-def unlink_wrapper(path: StrOrBytesPath, ignore_errors: bool = False, onexc: _OnExcCallback | None = None, dir_fd: int | None = None) -> None:
+def unlink_wrapper(
+    path: StrOrBytesPath,
+    ignore_errors: bool = False,
+    onexc: _OnExcCallback | None = None,
+    dir_fd: int | None = None,
+) -> None:
     """Wrapper for ``os.unlink`` to behave like ``shutil.rmtree`` in nature and arguments.
 
     Args:
@@ -98,11 +107,14 @@ def unlink_wrapper(path: StrOrBytesPath, ignore_errors: bool = False, onexc: _On
         # pylint: disable-next=W0613
         def _onexc_ignore(*args: Any) -> None:
             pass
+
         onexc = _onexc_ignore
     elif onexc is None:
+
         def _onexc_raise(*args: Any) -> NoReturn:
             # pylint: disable-next=E0704
             raise
+
         onexc = _onexc_raise
 
     if _use_fd_functions:
@@ -147,4 +159,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-#endregion
+# endregion

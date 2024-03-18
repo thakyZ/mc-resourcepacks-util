@@ -57,6 +57,7 @@ pylint = "^3.1.0"
 black = "^24.2.0"
 isort = "^5.13.2"
 flake8 = "^7.0.0"
+autopep8 = "^2.1.0"
 
 [tool.poetry.scripts]
 mc-resourcepacks-tools    = "mc_resourcepacks_util_tools.__init__:main"
@@ -74,30 +75,74 @@ build-backend = "poetry.core.masonry.api"
 [tool.pyright]
 include = [
   ".vscode/tasks",
+  "src/mc_resourcepacks_util_gui",
+  "src/mc_resourcepacks_util_query",
   "src/mc_resourcepacks_util_shared",
-  "src/query_resourcepacks",
-  "src/resourcepack_tools",
-  "src/mc_resourcepacks_util_gui"
+  "src/mc_resourcepacks_util_tools",
 ]
 exclude = [
-    "**/__pycache__",
-    "**/.mypy_cache"
+  "**/__pycache__",
+  "**/.mypy_cache",
 ]
-ignore = [".env/**"]
-
+ignore = [
+  ".env/**",
+]
+defineConstant = {}
 reportMissingImports = true
 reportMissingTypeStubs = false
-
 pythonVersion = "3.12"
-
 executionEnvironments = [
   { root = "src/mc_resourcepacks_util_gui",   pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
-  { root = "src/mc_resourcepacks_util_tools", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
   { root = "src/mc_resourcepacks_util_query", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_tools", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
   { root = ".vscode/tasks",                   pythonVersion = "3.12" },
   { root = "src" }
 ]
 
-# [tool.pylint.miscellaneous]
-# notes = ["FIXME", "XXX", "TODO"]
-# notes-rgx = "(_summary_|_description_)"
+[tool.isort]
+profile = "black"
+
+[tool.pylint.MASTER]
+ignore = [
+  "dist",
+  "docs",
+]
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+  "raw-checker-failed",
+  "bad-inline-option",
+  "locally-disabled",
+  "file-ignored",
+  "suppressed-message",
+  "useless-suppression",
+  "deprecated-pragma",
+  "use-symbolic-message-instead",
+  "use-implicit-booleaness-not-comparison-to-string",
+  "use-implicit-booleaness-not-comparison-to-zero",
+  "line-too-long",
+  "too-few-public-methods",
+  "broad-exception-caught",
+]
+
+[tool.pylint.MISCELLANEOUS]
+notes-rgx = "(_summary_|_description_|FIXME|XXX|TODO)"
+
+[tool.pylint.SIMILARITIES]
+# Minimum lines number of a similarity.
+min-similarity-lines = 4
+# Ignore comments when computing similarities.
+ignore-comments = "yes"
+# Ignore docstrings when computing similarities.
+ignore-docstrings = "yes"
+# Ignore imports when computing similarities.
+ignore-imports = "yes"
+
+[tool.pylint.format]
+max-line-length = 120
+
+[pycodestyle]
+max_line_length = 120
+max-line-length = 120
+ignore = "E501"
+recursive = true

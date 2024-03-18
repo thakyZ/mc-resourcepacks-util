@@ -23,9 +23,7 @@ from rich.style import StyleType
 from .errors import ArgumentMissingError
 
 
-STYLES: dict[str, StyleType] = {
-    "a": ""
-}
+STYLES: dict[str, StyleType] = {"a": ""}
 
 THEME: Theme = Theme(styles=STYLES, inherit=True)
 
@@ -41,7 +39,7 @@ CONSOLE: Console = Console(
     quiet=False,
     no_color=False,
     tab_size=4,
-    legacy_windows=False
+    legacy_windows=False,
 )
 
 LogLevel = Union[
@@ -52,25 +50,27 @@ LogLevel = Union[
     Literal["warn"],
     Literal["error"],
     Literal["exception"],
-    Literal["parser_error"]
+    Literal["parser_error"],
 ]
 
 
 # pylint: disable-next=R0913
-def pprint(*objects: Any,
-           level: LogLevel = "info",
-           new_line_start: bool = False,
-           show_locals: bool = False,
-           suppress: Iterable[str | ModuleType] = (),
-           _help: bool = False,
-           methods: bool = False,
-           docs: bool = True,
-           private: bool = False,
-           dunder: bool = False,
-           sort: bool = True,
-           _all: bool = False,
-           value: bool = True,
-           parser: ArgumentParser | None = None) -> None:
+def pprint(
+    *objects: Any,
+    level: LogLevel = "info",
+    new_line_start: bool = False,
+    show_locals: bool = False,
+    suppress: Iterable[str | ModuleType] = (),
+    _help: bool = False,
+    methods: bool = False,
+    docs: bool = True,
+    private: bool = False,
+    dunder: bool = False,
+    sort: bool = True,
+    _all: bool = False,
+    value: bool = True,
+    parser: ArgumentParser | None = None,
+) -> None:
     """A rich print wrapper.
 
     Args:
@@ -93,10 +93,23 @@ def pprint(*objects: Any,
     elif level == "exception":
         CONSOLE.print_exception(width=None, show_locals=show_locals, suppress=suppress)
     elif level == "inspect":
-        inspect(objects, console=CONSOLE, help=_help, methods=methods, docs=docs, private=private, dunder=dunder, sort=sort, all=_all, value=value)
+        inspect(
+            objects,
+            console=CONSOLE,
+            help=_help,
+            methods=methods,
+            docs=docs,
+            private=private,
+            dunder=dunder,
+            sort=sort,
+            all=_all,
+            value=value,
+        )
     elif level == "parser_error":
         if parser is None:
-            raise ArgumentMissingError("Argument <parser> is required to have a valid argument parser if level is \"parser_error\"")
+            raise ArgumentMissingError(
+                'Argument <parser> is required to have a valid argument parser if level is "parser_error"'
+            )
         for _, item in enumerate(objects):
             string_builder += str(item)
         parser.error(string_builder)
@@ -112,7 +125,14 @@ def pprint(*objects: Any,
         CONSOLE.print(*objects, new_line_start=new_line_start)
 
 
-def prompt(_prompt: TextType = "", *, password: bool = False, choices: list[str] | None = None, show_default: bool = True, show_choices: bool = True) -> str:
+def prompt(
+    _prompt: TextType = "",
+    *,
+    password: bool = False,
+    choices: list[str] | None = None,
+    show_default: bool = True,
+    show_choices: bool = True,
+) -> str:
     """Prompt the user for a response.
 
     Args:
@@ -123,10 +143,26 @@ def prompt(_prompt: TextType = "", *, password: bool = False, choices: list[str]
         show_choices (bool, optional): Show the list of choices. Defaults to True.
     """
     try:
-        rich_prompt: RichPrompt = RichPrompt(prompt=_prompt, console=CONSOLE, password=password, choices=choices, show_default=show_default, show_choices=show_choices)
-        value: str = rich_prompt.ask(prompt=_prompt, console=CONSOLE, password=password, choices=choices, show_default=show_default, show_choices=show_choices)
+        rich_prompt: RichPrompt = RichPrompt(
+            prompt=_prompt,
+            console=CONSOLE,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
+        value: str = rich_prompt.ask(
+            prompt=_prompt,
+            console=CONSOLE,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
         if choices is not None and not rich_prompt.check_choice(value):
-            raise PromptError(f"Submitted value from prompt, \"{value}\" is not a valid choice.")
+            raise PromptError(
+                f'Submitted value from prompt, "{value}" is not a valid choice.'
+            )
         return value
     except KeyboardInterrupt:
         CONSOLE.print()
@@ -137,6 +173,7 @@ class BColors:
     """Old Unix Console Color Class
     NOTE: This class is no longer needed
     """
+
     HEADER = "\033[95m"
     OK_BLUE = "\033[94m"
     OK_CYAN = "\033[96m"
@@ -180,9 +217,15 @@ def quit_with_error(exception: BaseException) -> NoReturn:
             if inner_line_pattern.match(_line):
                 pprint(f"[dark_red]{_line}[/dark_red]", level="exception")
             elif matched_line:
-                pprint(f"{matched_line.groups().index(0)}[dark_red]{matched_line.groups()[1]}[/dark_red]{matched_line.groups()[2]}", level="exception")
+                pprint(
+                    f"{matched_line.groups().index(0)}[dark_red]{matched_line.groups()[1]}[/dark_red]{matched_line.groups()[2]}",
+                    level="exception",
+                )
             elif matched_reason:
-                pprint(f"[dark_red]{matched_reason.groups()[0]}[/dark_red]: {matched_reason.groups()[1]}", level="exception")
+                pprint(
+                    f"[dark_red]{matched_reason.groups()[0]}[/dark_red]: {matched_reason.groups()[1]}",
+                    level="exception",
+                )
             else:
                 pprint(_line, level="exception")
     sys.exit(1)
@@ -249,4 +292,7 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> 
     tested: str = "[bold red]False[/bold red]"
     if test:
         tested = "[bold green]True[/bold green]"
-    pprint(f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green] [white bold]([/white bold]{tested}[white bold])[/white bold]", level="info")
+    pprint(
+        f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green] [white bold]([/white bold]{tested}[white bold])[/white bold]",
+        level="info",
+    )

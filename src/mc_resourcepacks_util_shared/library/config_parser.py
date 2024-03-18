@@ -6,7 +6,7 @@ from .script_arguments import ScriptArguments
 from .resourcepack import ResourcePack
 
 
-class ResourcePackTuple():
+class ResourcePackTuple:
     # TODO: Add class summary.
     """_summary_"""
 
@@ -80,9 +80,14 @@ def read_from_options(args: ScriptArguments) -> ResourcePackTuple:
     with args.options_file.open(encoding="utf8") as mc_options:
         for line in mc_options.readlines():
             if line.startswith("resourcePacks:"):
-                output.enabled = ResourcePack.to_list(line.removeprefix("resourcePacks:").removesuffix("\n"), args=args)
+                output.enabled = ResourcePack.to_list(
+                    line.removeprefix("resourcePacks:").removesuffix("\n"), args=args
+                )
             if line.startswith("incompatibleResourcePacks:"):
-                output.incompatible = ResourcePack.to_list(line.removeprefix("incompatibleResourcePacks:").removesuffix("\n"), args=args)
+                output.incompatible = ResourcePack.to_list(
+                    line.removeprefix("incompatibleResourcePacks:").removesuffix("\n"),
+                    args=args,
+                )
         mc_options.close()
     return output
 
@@ -102,8 +107,14 @@ def read_builtin_from_options(args: ScriptArguments) -> ResourcePackTuple:
     with args.options_file.open(encoding="utf8") as mc_options:
         for line in mc_options.readlines():
             if line.startswith("resourcePacks:"):
-                output.enabled = ResourcePack.to_list(line.removeprefix("resourcePacks:").removesuffix("\n"), args=args)
+                output.enabled = ResourcePack.to_list(
+                    line.removeprefix("resourcePacks:").removesuffix("\n"), args=args
+                )
             if line.startswith("incompatibleResourcePacks:"):
-                output.incompatible = ResourcePack.to_list(line.removeprefix("incompatibleResourcePacks:").removesuffix("\n"), args=args, built_in_only=True)
+                output.incompatible = ResourcePack.to_list(
+                    line.removeprefix("incompatibleResourcePacks:").removesuffix("\n"),
+                    args=args,
+                    built_in_only=True,
+                )
         mc_options.close()
     return output

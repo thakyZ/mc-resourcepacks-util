@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 from ctypes import ArgumentError
-from typing import Any, Generator, Literal, get_args
+from typing import Any, Generator, Literal, get_args, cast
 
 from .script_arguments import ScriptArguments
 
@@ -34,10 +34,29 @@ class MinecraftVersion:
 
     current_version: str = ""
 
-    ResourcePackVersion = Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    ResourcePackVersion = Literal[
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+    ]
 
     ResourcePackVersionSchema: dict[ResourcePackVersion, list[str] | None] = {
-        1: ["1.6", "1.6.1", "1.6.2", "1.6.4", "1.7", "1.7.2", "1.7.4", "1.7.5", "1.7.6", "1.7.7", "1.7.8", "1.7.9", "1.7.10", "1.8", "1.8.1", "1.8.2"],
+        1: [
+            "1.6",
+            "1.6.1",
+            "1.6.2",
+            "1.6.4",
+            "1.7",
+            "1.7.2",
+            "1.7.4",
+            "1.7.5",
+            "1.7.6",
+            "1.7.7",
+            "1.7.8",
+            "1.7.9",
+            "1.7.10",
+            "1.8",
+            "1.8.1",
+            "1.8.2",
+        ],
         2: ["1.9", "1.9.1", "1.9.2", "1.9.3", "1.9.4", "1.10", "1.10.1", "1.10.2"],
         3: ["1.11", "1.11.1", "1.11.2", "1.12", "1.12.1", "1.12.2"],
         4: ["1.13", "1.13.1", "1.13.2", "1.14", "1.14.1", "1.14.2", "1.14.3", "1.14.4"],
@@ -54,24 +73,36 @@ class MinecraftVersion:
         15: ["1.20", "1.20.1"],
         16: [],
         17: [],
-        18: ["1.20.2"]
+        18: ["1.20.2"],
     }
 
-    def __init__(self, resource_pack_version: ResourcePackVersion | None = None, minecraft_version: str | None = None) -> None:
+    def __init__(
+        self,
+        resource_pack_version: ResourcePackVersion | None = None,
+        minecraft_version: str | None = None,
+    ) -> None:
         _tmp_version: list[str] | None
         if resource_pack_version is None and minecraft_version is None:
-            raise ArgumentError("One of resource_pack_version or minecraft_version must be specified.")
+            raise ArgumentError(
+                "One of resource_pack_version or minecraft_version must be specified."
+            )
         if minecraft_version == "latest":
-            _tmp_version = self.ResourcePackVersionSchema.get(get_args(self.ResourcePackVersion)[-1])
+            _tmp_version = self.ResourcePackVersionSchema.get(
+                get_args(self.ResourcePackVersion)[-1]
+            )
             if _tmp_version is None:
-                raise ArithmeticError("Unable to find valid item in Resource Pack Version Schema.")
+                raise ArithmeticError(
+                    "Unable to find valid item in Resource Pack Version Schema."
+                )
             self.current_version = _tmp_version[-1]
         elif minecraft_version:
             self.current_version = minecraft_version
         elif resource_pack_version:
             _tmp_version = self.ResourcePackVersionSchema[resource_pack_version]
             if _tmp_version is None:
-                raise ArithmeticError("Unable to find valid item in Resource Pack Version Schema.")
+                raise ArithmeticError(
+                    "Unable to find valid item in Resource Pack Version Schema."
+                )
             self.current_version = _tmp_version[-1]
 
     def pack_version(self) -> ResourcePackVersion:
@@ -91,7 +122,9 @@ class MinecraftVersion:
                 if mc_version == self.current_version:
                     output = version
         if output is None:
-            raise NotValidMcVersionError(f"Minecraft version specified is not valid: {self.current_version}")
+            raise NotValidMcVersionError(
+                f"Minecraft version specified is not valid: {self.current_version}"
+            )
         return output
 
     @staticmethod
@@ -112,7 +145,14 @@ class MinecraftVersion:
     def __repr__(self) -> str:
         return f"current_version = {self.current_version} | pack_version = {self.pack_version()}"
 
-    def __rich_repr__(self) -> Generator[tuple[Literal["current_version"], str] | tuple[Literal["pack_version"], ResourcePackVersion], Any, None]:
+    def __rich_repr__(
+        self,
+    ) -> Generator[
+        tuple[Literal["current_version"], str]
+        | tuple[Literal["pack_version"], ResourcePackVersion],
+        Any,
+        None,
+    ]:
         yield "current_version", self.current_version
         yield "pack_version", self.pack_version()
 
@@ -132,18 +172,28 @@ def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | No
     """
     if args.minecraft_version in MinecraftVersion.get_valid_versions():
         return MinecraftVersion(minecraft_version=args.minecraft_version)
-    mmc_pack_json_path: Path = Path(os.path.realpath(args.dir), "..", "mmc-pack.json").resolve()
+    mmc_pack_json_path: Path = Path(
+        os.path.realpath(args.dir), "..", "mmc-pack.json"
+    ).resolve()
     # instance_cfg_path: Path = Path(os.path.realpath(args.dir), "..", "instance.cfg")
     output: None | MinecraftVersion = None
     if mmc_pack_json_path.exists():
         with mmc_pack_json_path.open(mode="r", encoding="utf8") as mmc_pack_json_file:
             data: dict[str, Any] = json.loads(mmc_pack_json_file.read())
+            # pylint: disable-next=R1702
             for key_t1, value_t1 in data.items():
                 if key_t1 == "components":
                     if isinstance(value_t1, list):
-                        for _, component in enumerate(value_t1):
-                            if isinstance(component, dict) and component["cachedName"].lower() == "minecraft":
-                                output = MinecraftVersion(minecraft_version=component["version"])
+                        _value_t1: list[Any] = cast(list[Any], value_t1)
+                        for _, component in enumerate(_value_t1):
+                            if isinstance(component, dict):
+                                _component: dict[str, Any] = cast(
+                                    dict[str, Any], component
+                                )
+                                if _component["cachedName"].lower() == "minecraft":
+                                    output = MinecraftVersion(
+                                        minecraft_version=_component["version"]
+                                    )
     # elif instance_cfg_path.exists():
     #     with instance_cfg_path.open(mode="r", encoding="utf8") as instance_cfg_file:
     #         for cfg_line in instance_cfg_file.readlines():
