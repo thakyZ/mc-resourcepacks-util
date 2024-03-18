@@ -1,19 +1,18 @@
 #!/usr/bin/python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson
-
 # TODO: Add Module Docstring.
 """_summary_"""
 
 from argparse import ArgumentParser
 import sys
+import os
 import traceback
 import re
 from re import Match, Pattern
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal, Union, Iterable, NoReturn
+from unittest.mock import Base
 
 from rich import inspect
 from rich.prompt import Prompt as RichPrompt, PromptError
@@ -23,6 +22,7 @@ from rich.text import TextType
 from rich.style import StyleType
 
 from .errors import ArgumentMissingError
+
 
 STYLES: dict[str, StyleType] = {
     "a": ""
@@ -56,6 +56,8 @@ LogLevel = Union[
     Literal["parser_error"]
 ]
 
+
+# pylint: disable-next=R0913
 def pprint(*objects: Any,
            level: LogLevel = "info",
            new_line_start: bool = False,
@@ -156,7 +158,7 @@ def quit_with_message(msg: str) -> NoReturn:
     Returns:
         NoReturn: Quits and doesn't continue the script.
     """
-    pprint(msg, level="error")
+    pprint(f"[red]{msg}[/red]", level="error")
     sys.exit(0)
 
 
@@ -187,6 +189,15 @@ def quit_with_error(exception: BaseException) -> NoReturn:
     sys.exit(1)
 
 
+def print_error(msg: str | BaseException) -> None:
+    """_summary_
+
+    Args:
+        msg (str | BaseException): _description_
+    """
+    pprint(f"[red]{msg}[/red]")
+
+
 def print_found_query(_file: str | Path, _path: str | Path) -> None:
     """Prints information that the script has found a query.
 
@@ -194,9 +205,13 @@ def print_found_query(_file: str | Path, _path: str | Path) -> None:
         _file (str | Path): The found file in the query.
         _path (str | Path): The path of the file on the query.
     """
-    new_path: Path
+    new_path: Path | str
     if isinstance(_path, str):
-        new_path = Path.resolve(Path(_path), strict=True)
+        try:
+            new_path = Path.resolve(Path(_path), strict=True)
+        except BaseException as base_exception:
+            pprint(base_exception)
+            new_path = _path.replace(os.path.sep, "/")
     else:
         new_path = _path
     new_file_path: str
@@ -216,9 +231,13 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> 
         _path (str): _description_
         test (bool): _description_
     """
-    new_path: Path
+    new_path: Path | str
     if isinstance(_path, str):
-        new_path = Path.resolve(Path(_path), strict=True)
+        try:
+            new_path = Path.resolve(Path(_path), strict=True)
+        except BaseException as base_exception:
+            print_error(base_exception)
+            new_path = _path.replace(os.path.sep, "/")
     else:
         new_path = _path
     new_file_path: str
@@ -229,4 +248,4 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> 
     tested: str = "[bold red]False[/bold red]"
     if test:
         tested = "[bold green]True[/bold green]"
-    pprint(f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green] ({tested})", level="info")
+    pprint(f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green] [white bold]([/white bold]{tested}[white bold])[/white bold]", level="info")

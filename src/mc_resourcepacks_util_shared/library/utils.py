@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson, Gson, chardet, resultdict
-
 """Utils to for this script."""
 
+import os
 import re
 from re import Pattern, Match
 import json
@@ -13,9 +11,16 @@ import io
 from pathlib import Path
 from typing import IO, Iterator, Literal, Type, TypeVar, Generic, Any, get_origin
 from zipfile import ZipFile
+import codecs
 import chardet
+from chardet import detect
+
+from .logger import pprint
+from .errors import EnvironmentVariableNotFoundError
+
 
 T = TypeVar('T')
+
 
 # pylint: disable-next=R0903
 class MyTypeChecker(Generic[T]):
@@ -38,7 +43,7 @@ class MyTypeChecker(Generic[T]):
             return obj is None
         class_arguments: list[Any] | Any = original_class.__args__
         generic_type: Any = class_arguments[0]
-        return isinstance(obj, generic_type) # type: ignore
+        return isinstance(obj, generic_type)  # type: ignore
 
 
 def is_typeof(_type: Type[T], obj: Any | None) -> bool:
@@ -52,7 +57,7 @@ def is_typeof(_type: Type[T], obj: Any | None) -> bool:
         bool: Returns ``True`` if the argument ``obj`` is of the type of the ``_type``.
     """
     if isinstance(obj, _type):
-        assert isinstance(obj, _type) # noinspection PyTypeHints
+        assert isinstance(obj, _type)  # noinspection PyTypeHints
         return True
     return False
 
@@ -85,18 +90,23 @@ def list_has(_list: list[Any], query: Any) -> bool:
     return False
 
 
-def list_append_many(_list: list[Any], other_list: list[Any]) -> None:
+def list_append_many(_list: list[Any], other_list: list[Any]) -> list[Any]:
     """Appends many items to a single list.
 
     Args:
         _list (list[Any]): The first list to append to.
         other_list (list[Any]): The second list to get items to append with.
+
+    Returns:
+        list[Any]: Items of type _list with other_list appended.
     """
+    output: list[Any] = _list
     for item in other_list:
-        _list.append(item)
+        output.append(item)
+    return output
 
 
-def escaped_config_chars(_json: str) -> str:
+def escape_config_chars(_json: str) -> str:
     """Escapes special unicode characters that would normally be escaped in Java Gson.
 
     Args:
@@ -106,20 +116,20 @@ def escaped_config_chars(_json: str) -> str:
         str: The json string with its invalid characters escaped.
     """
     output: str = _json
-    output = output.replace("!", "\\u0021")
-    output = output.replace("\\\"", "\\u0022")
-    output = output.replace("#", "\\u0023")
-    output = output.replace("$", "\\u0024")
-    output = output.replace("%", "\\u0025")
-    output = output.replace("&", "\\u0026")
-    output = output.replace("'", "\\u0027")
-    output = output.replace("(", "\\u0028")
-    output = output.replace(")", "\\u0029")
-    output = output.replace("\u00a7", "\\u00a7")
+    output = output.replace("!", r"\u0021")
+    output = output.replace("\"", r"\u0022")
+    output = output.replace("#", r"\u0023")
+    output = output.replace("$", r"\u0024")
+    output = output.replace("%", r"\u0025")
+    output = output.replace("&", r"\u0026")
+    output = output.replace("'", r"\u0027")
+    output = output.replace("(", r"\u0028")
+    output = output.replace(")", r"\u0029")
+    output = output.replace("\u00a7", r"\u00a7")
     return output
 
 
-def unescaped_config_chars(_json: str) -> str:
+def unescape_config_chars(_json: str) -> str:
     """Un-escapes special unicode characters that would normally be escaped in Java Gson.
 
     Args:
@@ -129,20 +139,22 @@ def unescaped_config_chars(_json: str) -> str:
         str: The json string with its invalid characters un-escaped.
     """
     output: str = _json
-    output = output.replace("\\u0021", "!")
-    output = output.replace("\\u0022", "\\\"")
-    output = output.replace("\\u0023", "#")
-    output = output.replace("\\u0024", "$")
-    output = output.replace("\\u0025", "%")
-    output = output.replace("\\u0026", "&")
-    output = output.replace("\\u0027", "'")
-    output = output.replace("\\u0028", "(")
-    output = output.replace("\\u0029", ")")
-    output = output.replace("\\u00a7",  "\u00a7")
+    output = output.replace(r"\u0021", "!")
+    output = output.replace(r"\u0022", "\"")
+    output = output.replace(r"\u0023", "#")
+    output = output.replace(r"\u0024", "$")
+    output = output.replace(r"\u0025", "%")
+    output = output.replace(r"\u0026", "&")
+    output = output.replace(r"\u0027", "'")
+    output = output.replace(r"\u0028", "(")
+    output = output.replace(r"\u0029", ")")
+    output = output.replace(r"\u00a7", "\u00a7")
     return output
+
 
 _ReadWriteMode = Literal["w", "w+", "wb", "wb+", "r", "r+", "rb", "rb+", "a", "a+", "ab", "ab+"]
 _ReadWriteModeBasic = Literal["w", "r"]
+
 
 def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r", zip_file: ZipFile | None = None, force_zip64: bool = False) -> IO[Any]:
     # TODO: Add summary for method.
@@ -162,7 +174,7 @@ def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r"
     Returns:
         IO[Any]: _description_
     """
-    def __simplify_mode__(mode: _ReadWriteMode | _ReadWriteModeBasic) -> _ReadWriteModeBasic:
+    def simplify_mode(mode: _ReadWriteMode | _ReadWriteModeBasic) -> _ReadWriteModeBasic:
         """Simplifies the mode parameter to be basic for zip file reading/writing.
 
         Args:
@@ -191,7 +203,7 @@ def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r"
         raw_data = tmp_read_zip.read()
         tmp_read_zip.close()
     encoding = chardet.detect(raw_data)["encoding"]
-    zip_file_stream: IO[bytes] = zip_file.open(name=file, mode=__simplify_mode__(mode), force_zip64=force_zip64)
+    zip_file_stream: IO[bytes] = zip_file.open(name=file, mode=simplify_mode(mode), force_zip64=force_zip64)
     if encoding is None:
         raise TypeError(f"Encoding type was not found for the file \"{file}\".")
     decoded_file_stream: IO[Any] = io.StringIO(zip_file_stream.read().decode(encoding=encoding))
@@ -200,6 +212,7 @@ def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r"
 
 _LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(r"Extra data: line (\d+) column (\d+) \(char (\d+)\)$", re.MULTILINE)
 _MULTI_LINE_ENSURE_REGEX: Pattern[str] = re.compile(r"^(?: |\t)*\"[^\r\n]+\": \"((?:[^\b\"]|\\.\r?\n)*)\",?$", re.MULTILINE)
+
 
 def try_decode_json_force(data: str) -> dict[str, Any]:
     """Tries to decode a JSON file, if a specific error is returned it will parse it anyways,
@@ -217,7 +230,7 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
     """
     output: dict[str, Any] = {}
 
-    def __ensure_single_line_json_string__(data: str) -> str:
+    def ensure_single_line_json_string(data: str) -> str:
         data = re.sub(r"\r?\n", r"\n", data, flags=0)
         cloned_data: str = data
         matches: Iterator[Match[str]] = _MULTI_LINE_ENSURE_REGEX.finditer(data)
@@ -228,7 +241,7 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
                 cloned_data = cloned_data.replace(group, new_string)
         return cloned_data
 
-    def __remove_extra_data__(data: str, extra_data_position: int) -> dict[str, Any]:
+    def remove_extra_data(data: str, extra_data_position: int) -> dict[str, Any]:
         cloned_data: str = ""
         for index, line in enumerate(data.splitlines(True)):
             if index >= extra_data_position - 1:
@@ -237,7 +250,7 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
         return json.loads(cloned_data)
 
     try:
-        tmp_ensured: str = __ensure_single_line_json_string__(data)
+        tmp_ensured: str = ensure_single_line_json_string(data)
         output = json.loads(tmp_ensured)
     except JSONDecodeError as json_decoder_error:
         error_msg: str = str(json_decoder_error)
@@ -246,10 +259,102 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
         exception_msg: Match[str] | None = _LINE_COLUMN_CHAR_REGEX.search(error_msg)
         if exception_msg is None:
             raise json_decoder_error
-        output = __remove_extra_data__(data, int(exception_msg.groups()[0]))
+        output = remove_extra_data(data, int(exception_msg.groups()[0]))
     except Exception as exception:
         raise exception
     except BaseException as base_exception:
         raise base_exception
 
     return output
+
+
+def transform_env_variables(value: str) -> str:
+    """_summary_
+
+    Args:
+        value (str): _description_
+
+    Raises:
+        EnvironmentVariableNotFoundError: _description_
+
+    Returns:
+        str: _description_
+    """
+    output: str = value
+    unix_regex: Pattern[str] = re.compile(r"(\$[\w\d_]+)\b")
+    pwsh_regex: Pattern[str] = re.compile(r"(\$env:[\w\d_]+)\b")
+    batch_regex: Pattern[str] = re.compile(r"(\%[\w\d_]+\%)")
+
+    unix_matches: Match[str] | None = unix_regex.search(output)
+    pwsh_matches: Match[str] | None = pwsh_regex.search(output)
+    batch_matches: Match[str] | None = batch_regex.search(output)
+
+    env_var: str | None = None
+
+    while unix_matches is not None or pwsh_matches is not None or batch_matches is not None:
+        if unix_matches is not None:
+            if os.name == "nt" and unix_matches.groups()[0] == "$HOME":
+                output = value.replace(unix_matches.groups()[0], os.path.expanduser("~"))
+            elif os.name != "nt":
+                env_var = os.environ.get(unix_matches.groups()[0].replace("$", ""))
+                if env_var is not None:
+                    output = value.replace(unix_matches.groups()[0], env_var)
+                else:
+                    raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{unix_matches.groups()[0]}\" was not found on the system.")
+        if pwsh_matches is not None:
+            env_var = os.environ.get(pwsh_matches.groups()[0].replace("$env:", ""))
+            if env_var is not None:
+                output = value.replace(pwsh_matches.groups()[0], env_var)
+            else:
+                raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{pwsh_matches.groups()[0]}\" was not found on the system.")
+        if batch_matches is not None:
+            env_var = os.environ.get(batch_matches.groups()[0].removeprefix("%").removesuffix("%"))
+            if env_var is not None:
+                output = value.replace(batch_matches.groups()[0], env_var)
+            else:
+                raise EnvironmentVariableNotFoundError(f"Environment variable by key, \"{batch_matches.groups()[0]}\" was not found on the system.")
+        unix_matches = unix_regex.search(output)
+        pwsh_matches = pwsh_regex.search(output)
+        batch_matches = batch_regex.search(output)
+    return output
+
+
+def check_if_regex_string(query: str) -> None | Pattern[str]:
+    """_summary_
+
+    Args:
+        query (str): _description_
+
+    Returns:
+        None | Pattern[str]: _description_
+    """
+    try:
+        return re.compile(query)
+    except re.error as re_error:
+        pprint(re_error)
+        return None
+    # pylint: disable-next=W0718
+    except BaseException as base:
+        pprint(base)
+        return None
+
+
+def decode_bytes(value: bytes | bytearray) -> str | None:
+    """_summary_
+
+    Args:
+        value (bytes | bytearray): _description_
+
+    Returns:
+        str | None: _description_
+    """
+    try:
+        encoding: str | None = detect(value)["encoding"]
+        if encoding is None:
+            return None
+        decode: str = codecs.decode(value, encoding, "strict")
+        return decode
+    # pylint: disable-next=W0718
+    except BaseException as base_exception:
+        pprint(base_exception)
+        return None

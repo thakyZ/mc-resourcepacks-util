@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson, kwarg, kwargs
-
 """Module containing extensions of other classes."""
 
 import os
@@ -111,7 +108,7 @@ class ScriptArguments():
     def __contains__(self, __name: str) -> bool:
         return __name in self.__dict__
 
-    def __getattr__(self, __name: str): # -> Any
+    def __getattr__(self, __name: str):  # -> Any
         """
         NOTE: This has been purposefully left untyped so that it can be more than a single type let
               alone `Any`.

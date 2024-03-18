@@ -4,16 +4,13 @@
 """_summary_"""
 
 import os
-from os import PathLike
 from pathlib import Path
-import argparse
-from argparse import ArgumentError, ArgumentTypeError
 
 from ..logger import pprint
+from ..constants import PathLike
 
-_PathLike = str | PathLike[str] | Path
 
-def validate_resolve_path(value: str) -> _PathLike:
+def validate_resolve_path(value: str) -> PathLike:
     # TODO: Add method docstring.
     # TODO: Add method docstring description for args/raises/returns.
     """_summary_
@@ -24,7 +21,7 @@ def validate_resolve_path(value: str) -> _PathLike:
     Returns:
         _PathLike: _description_
     """
-    output: _PathLike = value
+    output: PathLike = value
     try:
         output = Path(os.path.realpath(value))
     # pylint: disable-next=W0718

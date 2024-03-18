@@ -1,11 +1,8 @@
 #!/usr/bin/python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson, argparser
-
 """Main script module file."""
 
-from .library.compile import compile_resource_packs
+from .library.compile import compile_resourcepacks
 from .library.decompile import decompile_resourcepacks
 from .library.minecraft_version import MinecraftVersion, determine_current_mc_version
 from .library.logger import pprint, prompt

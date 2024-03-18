@@ -1,11 +1,7 @@
 #!/usr/bin/python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson
-
 """A module used to compile """
 
-import json
 import os
 from pathlib import Path
 import tempfile
@@ -14,7 +10,6 @@ from typing import Any
 from .script_arguments import ScriptArguments
 
 from .logger import pprint, quit_with_error
-from .utils import escaped_config_chars, unescaped_config_chars
 from .resourcepack import ResourcePack
 from .dir_file_utils import check_if_dir_exists_create
 
@@ -57,11 +52,11 @@ def compile_with_save(args: ScriptArguments, enabled: list[ResourcePack], incomp
                     for line in mc_options_source.readlines():
                         if line.startswith("resourcePacks:"):
                             # do any edits here, and then call target.write
-                            temp_json = json.dumps(enabled, default=json_default).replace('", "', '","').replace(r"\\", "\\")
+                            temp_json = ResourcePack.from_list(enabled)
                             mc_options_target.write(f"resourcePacks:{temp_json}\n")
                         elif line.startswith("incompatibleResourcePacks:"):
                             # do any edits here, and then call target.write
-                            temp_json = json.dumps(incompatible, default=json_default).replace('", "', '","').replace(r"\\", "\\")
+                            temp_json = ResourcePack.from_list(incompatible)
                             mc_options_target.write(f"incompatibleResourcePacks:{temp_json}\n")
                         else:
                             mc_options_target.write(line)
@@ -101,10 +96,10 @@ def compile_without_save(args: ScriptArguments, enabled: list[ResourcePack], inc
         try:
             for line in mc_options_source.readlines():
                 if line.startswith("resourcePacks:"):
-                    temp_json = json.dumps(obj=enabled, default=json_default).replace('", "', '","').replace(r"\\", "\\")
+                    temp_json = ResourcePack.from_list(enabled, False)
                     new_output += f"resourcePacks:{temp_json}\n"
                 elif line.startswith("incompatibleResourcePacks:"):
-                    temp_json = json.dumps(obj=incompatible, default=json_default).replace('", "', '","').replace(r"\\", "\\")
+                    temp_json = ResourcePack.from_list(incompatible, False)
                     new_output += f"incompatibleResourcePacks:{temp_json}\n"
                 else:
                     if not minimal:
@@ -115,7 +110,27 @@ def compile_without_save(args: ScriptArguments, enabled: list[ResourcePack], inc
     return new_output
 
 
-def compile_resource_packs(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]) -> None:
+def get_enabled_resourcepacks(args: ScriptArguments) -> list[ResourcePack]:
+    # TODO: Add method summary.
+    """_summary_
+
+    Args:
+        args (ScriptArguments): The arguments from the script CLI.
+
+    Returns:
+        list[ResourcePack]: _description_.
+    """
+    enabled: list[ResourcePack] = []
+    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(mode="r+", encoding="utf8") as enabled_file:
+        for item in enabled_file.readlines():
+            new_item: str = item.replace("\n", "")
+            if new_item != "" and item not in enabled:
+                enabled.append(ResourcePack(new_item, args=args))
+        enabled_file.close()
+    return enabled
+
+
+def compile_resourcepacks(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]) -> None:
     """Compiles all resource packs in the ``<dir>/../resource_packs/*.txt`` file into the ``<dir>/options.txt`` file.
 
     Args:
@@ -125,12 +140,6 @@ def compile_resource_packs(args: ScriptArguments, enabled: list[ResourcePack], i
     """
     check_if_dir_exists_create(args.compile_dir)
     # https://stackoverflow.com/a/71990118/1112800
-    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(mode="r+", encoding="utf8") as enabled_file:
-        for item in enabled_file.readlines():
-            new_item: str = item.replace("\n", "")
-            if new_item != "":
-                enabled.append(ResourcePack(new_item, args=args))
-        enabled_file.close()
     if args.save:
         compile_with_save(args, enabled, incompatible)
     else:

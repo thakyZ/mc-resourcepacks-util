@@ -1,8 +1,5 @@
 #!/usr/bin/python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson
-
 # TODO: Add Module Docstring.
 """_summary_"""
 

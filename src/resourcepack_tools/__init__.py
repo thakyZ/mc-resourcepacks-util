@@ -4,15 +4,17 @@
 
 from argparse import ArgumentParser
 
+
 from ..shared.main import filter_only_incompatible, find_from_missing
-from ..shared.library.validators.argparser import validate_resolve_path
-from ..shared.library.script_arguments import ScriptArguments
-from ..shared.library.compile import compile_resource_packs
+from ..shared.library.compile import compile_resourcepacks, get_enabled_resourcepacks
+from ..shared.library.config_parser import ResourcePackTuple, read_builtin_from_options, read_from_options
 from ..shared.library.decompile import decompile_resourcepacks
-from ..shared.library.minecraft_version import MinecraftVersion, determine_current_mc_version
 from ..shared.library.logger import pprint, prompt
-from ..shared.library.config_parser import read_builtin_from_options, read_from_options
+from ..shared.library.minecraft_version import MinecraftVersion, determine_current_mc_version
 from ..shared.library.resourcepack import ResourcePack
+from ..shared.library.script_arguments import ScriptArguments
+from ..shared.library.validators.argparser import validate_resolve_path
+from ..shared.library.utils import list_append_many
 
 
 def main() -> None:
@@ -25,7 +27,7 @@ def main() -> None:
     parser.add_argument("--minimal", action="store_true", help="Output compile to console in a minimal capacity.")
     parser.add_argument("--decompile", action="store_true", help="Decompiles the resource packs options.")
     parser.add_argument("--save", action="store_true", help="Saves the compiled resource pack options to the `options.txt'")
-    parser.add_argument("--minecraft_version", type=str, choices=MinecraftVersion.get_valid_versions(), help="Override the parsed minecraft version.", default="latest")
+    parser.add_argument("--minecraft_version", type=str, choices=MinecraftVersion.get_valid_versions(), help="Override the parsed minecraft version.")
 
     args: ScriptArguments = ScriptArguments(parser.parse_args())
 
@@ -40,8 +42,7 @@ def main() -> None:
     elif args.compile is True and args.decompile is True:
         pprint("--compile cannot be used with --decompile", level="parser_error", parser=parser)
 
-    enabled: list[ResourcePack] = []
-    incompatible: list[ResourcePack] = []
+    resourcepack_tuple: ResourcePackTuple
     resource_packs: list[ResourcePack] = ResourcePack.load_resource_packs(args)
     minecraft_version: MinecraftVersion | None = determine_current_mc_version(args)
 
@@ -50,12 +51,13 @@ def main() -> None:
         minecraft_version = MinecraftVersion(minecraft_version=output)
 
     if args.compile:
-        [enabled, incompatible] = read_builtin_from_options(args)
-        incompatible = filter_only_incompatible(resource_packs, minecraft_version)
-        compile_resource_packs(args, enabled, incompatible)
+        resourcepack_tuple = read_builtin_from_options(args)
+        resourcepack_tuple.enabled = get_enabled_resourcepacks(args)
+        resourcepack_tuple.incompatible = list_append_many(resourcepack_tuple.incompatible, filter_only_incompatible(resourcepack_tuple.enabled, minecraft_version))
+        compile_resourcepacks(args, resourcepack_tuple.enabled, resourcepack_tuple.incompatible)
     elif args.decompile:
-        [enabled, incompatible] = read_from_options(args)
-        disabled: list[ResourcePack] = find_from_missing(enabled, resource_packs)
-        decompile_resourcepacks(args, enabled, disabled)
+        resourcepack_tuple = read_from_options(args)
+        resourcepack_tuple.disabled = find_from_missing(resourcepack_tuple.enabled, resource_packs)
+        decompile_resourcepacks(args, resourcepack_tuple.enabled, resourcepack_tuple.disabled)
     else:
         pprint("Failed to do task", level="error")

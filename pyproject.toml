@@ -25,12 +25,15 @@ repository = "https://github.com/thakyZ/mc-resourcepacks-util"
 homepage = "https://github.com/thakyZ/mc-resourcepacks-util#README"
 documentation = "https://github.com/thakyZ/mc-resourcepacks-util/blob/main/docs/index.md"
 packages = [
+  # Shared packager definitions.
+  { include = "mc_resourcepacks_util_shared", from = "src" },
   # CLI packager definitions.
-  { include = "shared", from = "src", to = "mc_resourcepacks_util-cli" },
-  { include = "cli",    from = "src", to = "mc_resourcepacks_util-cli" },
+  { include = "query_resourcepacks",          from = "src", to = "mc_resourcepacks_util_query" },
+  { include = "query_resourcepacks",          from = "src" },
+  { include = "resourcepack_tools",           from = "src", to = "mc_resourcepacks_util_tools" },
+  { include = "resourcepack_tools",           from = "src" },
   # GUI packager definitions.
-  { include = "shared", from = "src", to = "mc_resourcepacks_util-gui" },
-  { include = "gui",    from = "src", to = "mc_resourcepacks_util-gui" }
+  { include = "mc_resourcepacks_util_gui",    from = "src" }
 ]
 
 [tool.poetry.urls]
@@ -55,8 +58,13 @@ black = "^24.2.0"
 isort = "^5.13.2"
 
 [tool.poetry.scripts]
-mc_resourcepacks_util_cli = "mc_resourcepacks_util-cli.__init__:main"
-mc_resourcepacks_util_gui = "mc_resourcepacks_util-gui.__init__:main"
+mc-resourcepacks-tools    = "mc_resourcepacks_util_tools.resourcepack_tools.__init__:main"
+resourcepack_tools        = "resourcepack_tools.__init__:main"
+mc-resourcepacks-query    = "mc_resourcepacks_util_query.query_resourcepacks.__init__:main"
+query_resourcepacks       = "query_resourcepacks.__init__:main"
+mc-resourcepacks-util-gui = "mc_resourcepacks_util_gui.gui.__init__:main"
+resourcepack_tools_gui    = "mc_resourcepacks_util_gui.gui.__init__:main"
+query_resourcepacks_gui   = "mc_resourcepacks_util_gui.gui.__init__:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson
-
 # TODO: Add Module Docstring.
 """_summary_"""
 
@@ -11,6 +8,8 @@ import os
 from pathlib import Path
 from ctypes import ArgumentError
 from typing import Any, Generator, Literal, get_args
+
+from .logger import pprint
 
 from .script_arguments import ScriptArguments
 
@@ -46,10 +45,18 @@ class MinecraftVersion:
     }
 
     def __init__(self, resource_pack_version: ResourcePackVersion | None = None, minecraft_version: str | None = None) -> None:
+        _tmp_version: list[str] | None
         if resource_pack_version is None and minecraft_version is None:
             raise ArgumentError("One of resource_pack_version or minecraft_version must be specified.")
         if minecraft_version == "latest":
-            _tmp_version: list[str] | None = self.ResourcePackVersionSchema.get(get_args(self.ResourcePackVersion)[-1])
+            _tmp_version = self.ResourcePackVersionSchema.get(get_args(self.ResourcePackVersion)[-1])
+            if _tmp_version is None:
+                raise ArithmeticError("Unable to find valid item in Resource Pack Version Schema.")
+            self.current_version = _tmp_version[-1]
+        elif minecraft_version:
+            self.current_version = minecraft_version
+        elif resource_pack_version:
+            _tmp_version = self.ResourcePackVersionSchema[resource_pack_version]
             if _tmp_version is None:
                 raise ArithmeticError("Unable to find valid item in Resource Pack Version Schema.")
             self.current_version = _tmp_version[-1]
@@ -97,14 +104,6 @@ class MinecraftVersion:
         yield "pack_version", self.pack_version()
 
 
-class Component(dict[str, Any]):
-    """A proxy list of components."""
-
-
-class ListOfComponents(list[Component]):
-    """A proxy list of components."""
-
-
 def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | None:
     # TODO: Add description for method returns/raises/arguments.
     """Determines the current minecraft version based off of the directory specified in the script arguments.
@@ -120,7 +119,7 @@ def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | No
     """
     if args.minecraft_version in MinecraftVersion.get_valid_versions():
         return MinecraftVersion(minecraft_version=args.minecraft_version)
-    mmc_pack_json_path: Path = Path(os.path.realpath(args.dir), "..", "mmc-pack.json")
+    mmc_pack_json_path: Path = Path(os.path.realpath(args.dir), "..", "mmc-pack.json").resolve()
     #instance_cfg_path: Path = Path(os.path.realpath(args.dir), "..", "instance.cfg")
     output: None | MinecraftVersion = None
     if mmc_pack_json_path.exists():
@@ -128,10 +127,10 @@ def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | No
             data: dict[str, Any] = json.loads(mmc_pack_json_file.read())
             for key_t1, value_t1 in data.items():
                 if key_t1 == "components":
-                    if isinstance(value_t1, ListOfComponents):
+                    if isinstance(value_t1, list):
                         for _, component in enumerate(value_t1):
-                            if isinstance(value_t1, Component) and component["cachedName"] == "minecraft":
-                                output = MinecraftVersion(component["version"])
+                            if isinstance(component, dict) and component["cachedName"].lower() == "minecraft":
+                                output = MinecraftVersion(minecraft_version=component["version"])
     #elif instance_cfg_path.exists():
     #    with instance_cfg_path.open(mode="r", encoding="utf8") as instance_cfg_file:
     #        for cfg_line in instance_cfg_file.readlines():

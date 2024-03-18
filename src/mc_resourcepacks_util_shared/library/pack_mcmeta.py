@@ -1,8 +1,5 @@
 #!/usr/bin/python3
 
-# pylint: disable=line-too-long,too-few-public-methods,broad-exception-caught
-# cSpell:word dunder, resourcepack, resourcepacks, mcmeta, Gson
-
 """A module containing data from the resourcepack's ``pack.mcmeta`` file."""
 
 from typing import Any, Generator, Literal

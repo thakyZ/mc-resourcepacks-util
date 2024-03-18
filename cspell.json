@@ -29,7 +29,12 @@
     "resourcepacks",
     "mcmeta",
     "Gson",
-    "argparser"
+    "argparser",
+    "chardet",
+    "resultdict",
+    "universaldetector",
+    "_typeshed",
+    "pwsh"
   ],
   "ignoreWords": [],
   "import": []
