@@ -2,11 +2,7 @@
 
 """Main script module file."""
 
-from .library.compile import compile_resourcepacks
-from .library.decompile import decompile_resourcepacks
-from .library.minecraft_version import MinecraftVersion, determine_current_mc_version
-from .library.logger import pprint, prompt
-from .library.config_parser import read_builtin_from_options, read_from_options
+from .library.minecraft_version import MinecraftVersion
 from .library.resourcepack import ResourcePack
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# TODO: Add Module Docstring.
+# TODO: Add module summary.
 """_summary_"""
 
 import os
@@ -13,6 +13,8 @@ from .query_builder import QueryBuilder
 
 
 def walk_and_talk(branches: list[str], trunk: Path | str, root: Path | str, query_builder: QueryBuilder, temp: Path | str | None = None) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -31,8 +33,8 @@ def walk_and_talk(branches: list[str], trunk: Path | str, root: Path | str, quer
 
 
 def walk_level(some_dir: str | Path, level: int = 1) -> Generator[tuple[str, list[str], list[str]], Any, None]:
-    # TODO: Add Method Docstring.
-    # TODO: Add description for method returns/raises/arguments.
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -55,8 +57,8 @@ def walk_level(some_dir: str | Path, level: int = 1) -> Generator[tuple[str, lis
 
 
 def check_if_dir_exists_create(_dir: str | Path) -> None:
-    # TODO: Add Method Docstring.
-    # TODO: Add description for method returns/raises/arguments.
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

@@ -112,6 +112,7 @@ def compile_without_save(args: ScriptArguments, enabled: list[ResourcePack], inc
 
 def get_enabled_resourcepacks(args: ScriptArguments) -> list[ResourcePack]:
     # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# TODO: Add Module Docstring.
+# TODO: Add module summary.
 """_summary_"""
 
 from argparse import ArgumentParser
@@ -12,7 +12,6 @@ from re import Match, Pattern
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal, Union, Iterable, NoReturn
-from unittest.mock import Base
 
 from rich import inspect
 from rich.prompt import Prompt as RichPrompt, PromptError
@@ -190,6 +189,8 @@ def quit_with_error(exception: BaseException) -> NoReturn:
 
 
 def print_error(msg: str | BaseException) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -223,7 +224,7 @@ def print_found_query(_file: str | Path, _path: str | Path) -> None:
 
 
 def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> None:
-    # TODO: Add description for method returns/raises/arguments.
+    # TODO: Add description for arguments/raises/returns.
     """Prints information that the script has found a query.
 
     Args:

@@ -8,7 +8,6 @@ from pathlib import Path
 from types import NotImplementedType
 from typing import Any
 
-from .logger import pprint
 
 class ScriptArguments():
     """A custom extensions of the ``argparse`` ``Namespace`` class."""
@@ -88,7 +87,7 @@ class ScriptArguments():
         raise FileNotFoundError("Path specified was not a valid minecraft directory.")
 
     def __test_if_is_minecraft_dir__(self, path: Path) -> bool:
-        if path.name in ["minecraft",".minecraft"]:
+        if path.name in ["minecraft", ".minecraft"]:
             return True
         if Path(path, "options.txt").exists() and Path(path, "resourcepacks").exists():
             return True

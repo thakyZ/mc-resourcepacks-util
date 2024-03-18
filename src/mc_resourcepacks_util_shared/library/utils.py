@@ -157,8 +157,8 @@ _ReadWriteModeBasic = Literal["w", "r"]
 
 
 def open_file(file: Path | str, mode: _ReadWriteMode | _ReadWriteModeBasic = "r", zip_file: ZipFile | None = None, force_zip64: bool = False) -> IO[Any]:
-    # TODO: Add summary for method.
-    # TODO: Add description for method returns/raises/arguments.
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -269,6 +269,8 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
 
 
 def transform_env_variables(value: str) -> str:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -320,6 +322,8 @@ def transform_env_variables(value: str) -> str:
 
 
 def check_if_regex_string(query: str) -> None | Pattern[str]:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -340,6 +344,8 @@ def check_if_regex_string(query: str) -> None | Pattern[str]:
 
 
 def decode_bytes(value: bytes | bytearray) -> str | None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

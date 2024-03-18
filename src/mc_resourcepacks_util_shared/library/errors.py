@@ -3,23 +3,29 @@
 """Module Containing Custom Errors."""
 
 
-class NotValidRegexError(BaseException):
+class NotValidRegexError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
-        BaseException (_type_): _description_
+        Exception (_type_): _description_
     """
 
 
-class EnvironmentVariableNotFoundError(BaseException):
+class EnvironmentVariableNotFoundError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
-        BaseException (_type_): _description_
+        Exception (_type_): _description_
     """
 
 
 class FailedToLoadDataError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """Error when a task to load data had failed.
 
     Args:
@@ -28,6 +34,8 @@ class FailedToLoadDataError(Exception):
 
 
 class NotYetImplementedError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """Error when a task is run and not yet implemented.
 
     Args:
@@ -36,6 +44,8 @@ class NotYetImplementedError(Exception):
 
 
 class ArgumentMissingError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """Error when a argument is not specified when needed.
 
     Args:
@@ -44,6 +54,8 @@ class ArgumentMissingError(Exception):
 
 
 class NotValidMcVersionError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
     """Error when the version specified was not valid.
 
     Args:

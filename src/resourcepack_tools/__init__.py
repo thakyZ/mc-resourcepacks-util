@@ -4,17 +4,16 @@
 
 from argparse import ArgumentParser
 
-
-from ..shared.main import filter_only_incompatible, find_from_missing
-from ..shared.library.compile import compile_resourcepacks, get_enabled_resourcepacks
-from ..shared.library.config_parser import ResourcePackTuple, read_builtin_from_options, read_from_options
-from ..shared.library.decompile import decompile_resourcepacks
-from ..shared.library.logger import pprint, prompt
-from ..shared.library.minecraft_version import MinecraftVersion, determine_current_mc_version
-from ..shared.library.resourcepack import ResourcePack
-from ..shared.library.script_arguments import ScriptArguments
-from ..shared.library.validators.argparser import validate_resolve_path
-from ..shared.library.utils import list_append_many
+from mc_resourcepacks_util_shared.main import filter_only_incompatible, find_from_missing
+from mc_resourcepacks_util_shared.library.compile import compile_resourcepacks, get_enabled_resourcepacks
+from mc_resourcepacks_util_shared.library.config_parser import ResourcePackTuple, read_builtin_from_options, read_from_options
+from mc_resourcepacks_util_shared.library.decompile import decompile_resourcepacks
+from mc_resourcepacks_util_shared.library.logger import pprint, prompt
+from mc_resourcepacks_util_shared.library.minecraft_version import MinecraftVersion, determine_current_mc_version
+from mc_resourcepacks_util_shared.library.resourcepack import ResourcePack
+from mc_resourcepacks_util_shared.library.script_arguments import ScriptArguments
+from mc_resourcepacks_util_shared.library.validators.argparser import validate_resolve_path
+from mc_resourcepacks_util_shared.library.utils import list_append_many
 
 
 def main() -> None:

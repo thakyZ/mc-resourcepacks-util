@@ -2,13 +2,12 @@
 
 """Temporary Module Docstring."""
 
-import json
-
 from .script_arguments import ScriptArguments
 from .resourcepack import ResourcePack
 
 
 class ResourcePackTuple():
+    # TODO: Add class summary.
     """_summary_"""
 
     _enabled: list[ResourcePack] | None = None
@@ -17,6 +16,8 @@ class ResourcePackTuple():
 
     @property
     def enabled(self) -> list[ResourcePack]:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
         """_summary_
 
         Returns:
@@ -32,6 +33,8 @@ class ResourcePackTuple():
 
     @property
     def disabled(self) -> list[ResourcePack]:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
         """_summary_
 
         Returns:
@@ -47,6 +50,8 @@ class ResourcePackTuple():
 
     @property
     def incompatible(self) -> list[ResourcePack]:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
         """_summary_
 
         Returns:
@@ -62,6 +67,7 @@ class ResourcePackTuple():
 
 
 def read_from_options(args: ScriptArguments) -> ResourcePackTuple:
+    # TODO: Add description for arguments/raises/returns.
     """Read resourcepacks and incompatible resourcepacks from ``options.txt`` file.
 
     Args:
@@ -82,6 +88,8 @@ def read_from_options(args: ScriptArguments) -> ResourcePackTuple:
 
 
 def read_builtin_from_options(args: ScriptArguments) -> ResourcePackTuple:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

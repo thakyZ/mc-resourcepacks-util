@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf8
 
+# TODO: Add module summary.
 """_summary_"""
 
 import re
@@ -9,16 +10,21 @@ from typing import Literal
 
 from .logger import quit_with_error
 from .errors import NotValidRegexError
-from .utils import check_if_regex_string
 
 
 class QueryBuilder:
+    # TODO: Add class summary.
+    # _summary_: a
+    # _summary_
     """_summary_"""
     query: Pattern[str]
     patch: str = ""
     is_emissive_check: bool = False
 
     def __init__(self, query: str, regex: bool = False, parameter: Literal["emissive"] | None = None) -> None:
+        # NOTE: These are imported while not on the top level, because of import recursion.
+        # pylint: disable-next=C0415
+        from .utils import check_if_regex_string
         test: Pattern[str] | None = None
         if regex:
             test = check_if_regex_string(query)
@@ -42,6 +48,8 @@ class QueryBuilder:
             self.is_emissive_check = True
 
     def to_list(self) -> list[str]:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
         """_summary_
 
         Returns:

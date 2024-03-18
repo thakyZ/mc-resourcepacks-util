@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf8
 
+# TODO: Add module summary.
 """_summary_"""
 
 import os
@@ -17,6 +18,8 @@ from .constants import command_regex
 
 
 def query_when_or_not_regex(leaf: Path | str, branch: Path | str, trunk: Path | str, query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -31,6 +34,8 @@ def query_when_or_not_regex(leaf: Path | str, branch: Path | str, trunk: Path | 
 
 
 def test_match_of_opened_file(directory: Path | str, file: Path | str, line: str, query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -46,6 +51,8 @@ def test_match_of_opened_file(directory: Path | str, file: Path | str, line: str
 
 
 def iterate_dir_ext(path: Path, directories: list[str], query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -72,6 +79,8 @@ def iterate_dir_ext(path: Path, directories: list[str], query_builder: QueryBuil
 
 
 def iterate_file_ext(file_ext: str, path: Path, files: list[str], base_directory: Path, query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -108,6 +117,8 @@ def iterate_file_ext(file_ext: str, path: Path, files: list[str], base_directory
 
 
 def iterate_dir_arg(file_exts: list[str], _dir: Path, query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:
@@ -125,6 +136,8 @@ def iterate_dir_arg(file_exts: list[str], _dir: Path, query_builder: QueryBuilde
 
 
 def parse_files(file_exts: list[str], directories: list[Path], query_builder: QueryBuilder) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

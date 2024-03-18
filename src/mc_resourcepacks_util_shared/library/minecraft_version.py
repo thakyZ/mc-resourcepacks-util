@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# TODO: Add Module Docstring.
+# TODO: Add module summary.
 """_summary_"""
 
 import json
@@ -9,16 +9,29 @@ from pathlib import Path
 from ctypes import ArgumentError
 from typing import Any, Generator, Literal, get_args
 
-from .logger import pprint
-
 from .script_arguments import ScriptArguments
 
 from .errors import NotValidMcVersionError
 
 
 class MinecraftVersion:
-    # TODO: Add Method Docstring.
-    """_summary_"""
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Raises:
+        ArgumentError: _description_
+        ArithmeticError: _description_
+        ArithmeticError: _description_
+        NotValidMcVersionError: _description_
+
+    Returns:
+        _type_: _description_
+
+    Yields:
+        _type_: _description_
+    """
+
     current_version: str = ""
 
     ResourcePackVersion = Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
@@ -105,7 +118,7 @@ class MinecraftVersion:
 
 
 def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | None:
-    # TODO: Add description for method returns/raises/arguments.
+    # TODO: Add description for arguments/raises/returns.
     """Determines the current minecraft version based off of the directory specified in the script arguments.
 
     Args:
@@ -120,7 +133,7 @@ def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | No
     if args.minecraft_version in MinecraftVersion.get_valid_versions():
         return MinecraftVersion(minecraft_version=args.minecraft_version)
     mmc_pack_json_path: Path = Path(os.path.realpath(args.dir), "..", "mmc-pack.json").resolve()
-    #instance_cfg_path: Path = Path(os.path.realpath(args.dir), "..", "instance.cfg")
+    # instance_cfg_path: Path = Path(os.path.realpath(args.dir), "..", "instance.cfg")
     output: None | MinecraftVersion = None
     if mmc_pack_json_path.exists():
         with mmc_pack_json_path.open(mode="r", encoding="utf8") as mmc_pack_json_file:
@@ -131,9 +144,9 @@ def determine_current_mc_version(args: ScriptArguments) -> MinecraftVersion | No
                         for _, component in enumerate(value_t1):
                             if isinstance(component, dict) and component["cachedName"].lower() == "minecraft":
                                 output = MinecraftVersion(minecraft_version=component["version"])
-    #elif instance_cfg_path.exists():
-    #    with instance_cfg_path.open(mode="r", encoding="utf8") as instance_cfg_file:
-    #        for cfg_line in instance_cfg_file.readlines():
+    # elif instance_cfg_path.exists():
+    #     with instance_cfg_path.open(mode="r", encoding="utf8") as instance_cfg_file:
+    #         for cfg_line in instance_cfg_file.readlines():
     #
     else:
         raise NotValidMcVersionError("")

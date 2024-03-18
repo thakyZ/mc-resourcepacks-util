@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# TODO: Add Module Docstring.
+# TODO: Add module summary.
 """_summary_"""
 
 import os
@@ -11,8 +11,8 @@ from ..constants import PathLike
 
 
 def validate_resolve_path(value: str) -> PathLike:
-    # TODO: Add method docstring.
-    # TODO: Add method docstring description for args/raises/returns.
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
     """_summary_
 
     Args:

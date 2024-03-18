@@ -5,13 +5,10 @@
 import zipfile
 from zipfile import ZipFile
 from pathlib import Path
-from typing import Any, Callable, Generator, Literal
-
-from .logger import pprint
+from typing import Any, Generator, Literal
 
 from .script_arguments import ScriptArguments
 from .errors import ArgumentMissingError
-from .dir_file_utils import walk_level
 from .pack_mcmeta import PackMcMeta
 from .utils import escape_config_chars, open_file, try_decode_json_force, unescape_config_chars
 
@@ -80,9 +77,7 @@ class ResourcePack():
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, ResourcePack):
-            return (self.config_string == other.config_string and
-                    self.resourcepack_file == other.resourcepack_file and
-                    self.mcmeta_file == other.mcmeta_file)
+            return self.config_string == other.config_string and self.resourcepack_file == other.resourcepack_file and self.mcmeta_file == other.mcmeta_file
         if isinstance(other, str):
             return self.config_string == other.removesuffix("\n")
         if isinstance(other, Path):
@@ -121,6 +116,8 @@ class ResourcePack():
 
     @staticmethod
     def from_list(config_list: list["ResourcePack"], raw: bool = True) -> str:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
         """_summary_
 
         Args:
@@ -130,7 +127,7 @@ class ResourcePack():
         Returns:
             str: _description_
         """
-        def __add_surrounding_quotes__(arg: ResourcePack) -> str:
+        def add_surrounding_quotes(arg: ResourcePack) -> str:
             output: str = "\""
             if raw:
                 output += arg.raw_config_string.replace(r"\\", "\\")
@@ -139,7 +136,7 @@ class ResourcePack():
             output += "\""
             return output
 
-        simple_list: list[str] = list(map(__add_surrounding_quotes__, config_list))
+        simple_list: list[str] = list(map(add_surrounding_quotes, config_list))
         str_config_list: str = f"[{','.join(simple_list)}]"
         return str_config_list
 
@@ -153,16 +150,16 @@ class ResourcePack():
         Returns:
             list[ResourcePack]: A list of resourcepack data
         """
+        # NOTE: These are imported while not on the top level, because of import recursion.
+        # pylint: disable-next=C0415
+        from .dir_file_utils import walk_level
         resourcepacks: list[ResourcePack] = []
-        mcmeta: PackMcMeta
         for root, directories, files in walk_level(args.resourcepacks_folder, level=0):
             for directory in directories:
-                resourcepack_file: Path = Path(root, directory)
-                mcmeta_file: Path = Path(resourcepack_file, "pack.mcmeta")
+                mcmeta_file: Path = Path(root, directory, "pack.mcmeta")
                 if mcmeta_file.exists():
                     with open_file(mcmeta_file, mode="r") as mcmeta_dir_file:
-                        mcmeta = PackMcMeta(try_decode_json_force(mcmeta_dir_file.read()))
-                        resourcepack_data = ResourcePack(file=resourcepack_file, mcmeta=mcmeta)
+                        resourcepack_data = ResourcePack(file=Path(root, directory), mcmeta=PackMcMeta(try_decode_json_force(mcmeta_dir_file.read())))
                         resourcepacks.append(resourcepack_data)
             for file in files:
                 file_path: Path = Path(root, file)
@@ -172,7 +169,6 @@ class ResourcePack():
                             if zipped_file != "pack.mcmeta":
                                 continue
                             with open_file(zipped_file, zip_file=zip_file, mode="r", force_zip64=True) as zipped_file_stream:
-                                mcmeta = PackMcMeta(try_decode_json_force(zipped_file_stream.read()))
-                                resourcepack_data = ResourcePack(file=file_path, mcmeta=mcmeta)
+                                resourcepack_data = ResourcePack(file=file_path, mcmeta=PackMcMeta(try_decode_json_force(zipped_file_stream.read())))
                                 resourcepacks.append(resourcepack_data)
         return resourcepacks
