@@ -1,4 +1,4 @@
-#:schema ./.vscode/pyproject.schema.json
+#:schema https://gist.github.com/thakyZ/794efc5003ad437d387f6e75fefcbacc/pyproject.json
 [tool.poetry]
 name = "mc-resourcepacks-util"
 version = "1.0.0"
@@ -26,14 +26,14 @@ homepage = "https://github.com/thakyZ/mc-resourcepacks-util#README"
 documentation = "https://github.com/thakyZ/mc-resourcepacks-util/blob/main/docs/index.md"
 packages = [
   # Shared packager definitions.
-  { include = "mc_resourcepacks_util_shared", from = "src" },
+  { include = "mc_resourcepacks_util_shared", from = "src"                            },
   # CLI packager definitions.
-  { include = "query_resourcepacks",          from = "src", to = "mc_resourcepacks_util_query" },
-  { include = "query_resourcepacks",          from = "src" },
-  { include = "resourcepack_tools",           from = "src", to = "mc_resourcepacks_util_tools" },
-  { include = "resourcepack_tools",           from = "src" },
+  { include = "mc_resourcepacks_util_query", from = "src", to = "query_resourcepacks" },
+  { include = "mc_resourcepacks_util_query", from = "src"                             },
+  { include = "mc_resourcepacks_util_tools", from = "src", to = "resourcepack_tools"  },
+  { include = "mc_resourcepacks_util_tools", from = "src"                             },
   # GUI packager definitions.
-  { include = "mc_resourcepacks_util_gui",    from = "src" }
+  { include = "mc_resourcepacks_util_gui",   from = "src"                             },
 ]
 
 [tool.poetry.urls]
@@ -56,15 +56,16 @@ mypy = "^1.8.0"
 pylint = "^3.1.0"
 black = "^24.2.0"
 isort = "^5.13.2"
+flake8 = "^7.0.0"
 
 [tool.poetry.scripts]
-mc-resourcepacks-tools    = "mc_resourcepacks_util_tools.resourcepack_tools.__init__:main"
-resourcepack_tools        = "resourcepack_tools.__init__:main"
-mc-resourcepacks-query    = "mc_resourcepacks_util_query.query_resourcepacks.__init__:main"
-query_resourcepacks       = "query_resourcepacks.__init__:main"
-mc-resourcepacks-util-gui = "mc_resourcepacks_util_gui.gui.__init__:main"
-resourcepack_tools_gui    = "mc_resourcepacks_util_gui.gui.__init__:main"
-query_resourcepacks_gui   = "mc_resourcepacks_util_gui.gui.__init__:main"
+mc-resourcepacks-tools    = "mc_resourcepacks_util_tools.__init__:main"
+resourcepack_tools        = "resourcepack_tools.mc_resourcepacks_util_tools.__init__:main"
+mc-resourcepacks-query    = "mc_resourcepacks_util_query.__init__:main"
+query_resourcepacks       = "query_resourcepacks.mc_resourcepacks_util_query.__init__:main"
+mc-resourcepacks-util-gui = "mc_resourcepacks_util_gui.__init__:main"
+resourcepack_tools_gui    = "mc_resourcepacks_util_gui.__init__:main"
+query_resourcepacks_gui   = "mc_resourcepacks_util_gui.__init__:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -73,9 +74,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.pyright]
 include = [
   ".vscode/tasks",
-  "src/shared",
-  "src/cli",
-  "src/gui"
+  "src/mc_resourcepacks_util_shared",
+  "src/query_resourcepacks",
+  "src/resourcepack_tools",
+  "src/mc_resourcepacks_util_gui"
 ]
 exclude = [
     "**/__pycache__",
@@ -89,8 +91,13 @@ reportMissingTypeStubs = false
 pythonVersion = "3.12"
 
 executionEnvironments = [
-  { root = "src/gui", pythonVersion = "3.12", extraPaths = [ "src/shared" ] },
-  { root = "src/cli", pythonVersion = "3.12", extraPaths = [ "src/shared" ] },
-  { root = ".vscode/tasks", pythonVersion = "3.12" },
+  { root = "src/mc_resourcepacks_util_gui",   pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_tools", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_query", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = ".vscode/tasks",                   pythonVersion = "3.12" },
   { root = "src" }
 ]
+
+# [tool.pylint.miscellaneous]
+# notes = ["FIXME", "XXX", "TODO"]
+# notes-rgx = "(_summary_|_description_)"

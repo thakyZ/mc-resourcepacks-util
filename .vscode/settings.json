@@ -9,8 +9,8 @@
     ".venv/Lib/site-packages"
   ],
   "evenBetterToml.schema.associations": {
-    // "pyproject.toml": "https://gist.github.com/thakyZ/794efc5003ad437d387f6e75fefcbacc/pyproject.json"
-    "pyproject\\.toml": "file:///${workspaceFolder}/.vscode/pyproject.schema.json"
+    "pyproject\\.toml": "https://gist.github.com/thakyZ/794efc5003ad437d387f6e75fefcbacc/pyproject.json"
+    // "pyproject\\.toml": "file:///${workspaceFolder}/.vscode/pyproject.schema.json"
   },
   "pylint.interpreter": [
     "${workspaceFolder}/.env/Scripts/python.exe",
