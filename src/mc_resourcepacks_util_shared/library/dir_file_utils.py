@@ -34,8 +34,8 @@ def walk_and_talk(
     if temp is not None:
         trim_trunk = temp
     for branch in branches:
-        if re.match(query_builder.query, f"{Path(trunk, branch)}") is not None:
-            print_found_query(Path(root), Path(trim_trunk, branch))
+        if re.match(query_builder.query, str(Path(trunk, branch))) is not None:
+            print_found_query(root, str(Path(trim_trunk, branch)), False, False)
 
 
 def walk_level(

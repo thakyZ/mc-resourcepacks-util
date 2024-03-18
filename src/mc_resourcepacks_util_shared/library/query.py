@@ -18,7 +18,7 @@ from .constants import command_regex
 
 
 def query_when_or_not_regex(
-    leaf: Path | str, branch: Path | str, trunk: Path | str, query_builder: QueryBuilder
+    leaf: Path | str, branch: Path | str, trunk: Path | str, query_builder: QueryBuilder, compressed: bool = False
 ) -> None:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
@@ -31,12 +31,14 @@ def query_when_or_not_regex(
         query_builder (QueryBuilder): _description_
         temp (str | None, optional): _description_. Defaults to None.
     """
-    if re.match(query_builder.query, f"{branch}") is not None:
-        print_found_query(Path(leaf), trunk)
+    if re.match(query_builder.query, str(branch)) is not None:
+        if compressed is False:
+            trunk = str(branch).replace(str(leaf), "").removeprefix("/").removeprefix("\\")
+        print_found_query(leaf, trunk, compressed, False)
 
 
 def test_match_of_opened_file(
-    directory: Path | str, file: Path | str, line: str, query_builder: QueryBuilder
+    directory: Path | str, file: Path | str, line: str, query_builder: QueryBuilder, compressed: bool = False
 ) -> None:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
@@ -50,8 +52,10 @@ def test_match_of_opened_file(
     """
     matches: Match[str] | None = re.search(command_regex, line)
     if matches:
+        if compressed is False:
+            file = str(file).replace(str(directory), "").removeprefix("/").removeprefix("\\")
         test: bool = matches.groups()[0] == query_builder.query
-        print_found_query_bool(directory, file, test)
+        print_found_query_bool(directory, file, test, compressed, False)
 
 
 def iterate_dir_ext(
@@ -132,7 +136,7 @@ def iterate_file_ext(
                                                     file,
                                                     compressed_file,
                                                     line,
-                                                    query_builder,
+                                                    query_builder, compressed=True
                                                 )
                             else:
                                 query_when_or_not_regex(
@@ -140,10 +144,15 @@ def iterate_file_ext(
                                     compressed_file,
                                     compressed_file,
                                     query_builder,
+                                    True
                                 )
                         else:
                             query_when_or_not_regex(
-                                file, compressed_file, compressed_file, query_builder
+                                file,
+                                compressed_file,
+                                compressed_file,
+                                query_builder,
+                                True
                             )
         # pylint: disable-next=W0718
         except BaseException as base_exception:

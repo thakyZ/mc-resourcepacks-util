@@ -231,7 +231,7 @@ def quit_with_error(exception: BaseException) -> NoReturn:
     sys.exit(1)
 
 
-def print_error(msg: str | BaseException) -> None:
+def print_error(msg: str) -> None:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
     """_summary_
@@ -239,10 +239,21 @@ def print_error(msg: str | BaseException) -> None:
     Args:
         msg (str | BaseException): _description_
     """
-    pprint(f"[red]{msg}[/red]")
+    pprint(f"[red]{msg}[/red]", level="exception")
 
 
-def print_found_query(_file: str | Path, _path: str | Path) -> None:
+def print_exception(exception: BaseException) -> None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Args:
+        msg (str | BaseException): _description_
+    """
+    pprint(exception, level="exception")
+
+
+def print_found_query(_file: str | Path, _path: str | Path, compressed: bool, short: bool) -> None:
     """Prints information that the script has found a query.
 
     Args:
@@ -250,23 +261,25 @@ def print_found_query(_file: str | Path, _path: str | Path) -> None:
         _path (str | Path): The path of the file on the query.
     """
     new_path: Path | str
-    if isinstance(_path, str):
+    if isinstance(_path, str) and compressed is False:
         try:
             new_path = Path.resolve(Path(_path), strict=True)
+        except FileNotFoundError:
+            new_path = _path.replace(os.path.sep, "/")
         except BaseException as base_exception:
-            pprint(base_exception)
+            print_exception(base_exception)
             new_path = _path.replace(os.path.sep, "/")
     else:
         new_path = _path
     new_file_path: str
-    if isinstance(_file, Path):
+    if isinstance(_file, Path) and short is True:
         new_file_path = _file.name
     else:
-        new_file_path = _file
+        new_file_path = str(_file)
     pprint(f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green]", level="info")
 
 
-def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> None:
+def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool, compressed: bool, short: bool) -> None:
     # TODO: Add description for arguments/raises/returns.
     """Prints information that the script has found a query.
 
@@ -276,19 +289,21 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool) -> 
         test (bool): _description_
     """
     new_path: Path | str
-    if isinstance(_path, str):
+    if isinstance(_path, str) and compressed is False:
         try:
             new_path = Path.resolve(Path(_path), strict=True)
+        except FileNotFoundError:
+            new_path = _path.replace(os.path.sep, "/")
         except BaseException as base_exception:
-            print_error(base_exception)
+            print_exception(base_exception)
             new_path = _path.replace(os.path.sep, "/")
     else:
         new_path = _path
     new_file_path: str
-    if isinstance(_file, Path):
+    if isinstance(_file, Path) and short is True:
         new_file_path = _file.name
     else:
-        new_file_path = _file
+        new_file_path = str(_file)
     tested: str = "[bold red]False[/bold red]"
     if test:
         tested = "[bold green]True[/bold green]"
