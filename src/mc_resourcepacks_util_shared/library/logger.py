@@ -275,7 +275,7 @@ def print_found_query(_file: str | Path, _path: str | Path, compressed: bool, sh
     if isinstance(_file, Path) and short is True:
         new_file_path = _file.name
     else:
-        new_file_path = str(_file)
+        new_file_path = str(_file).replace("\\[", r"\\[")
     pprint(f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green]", level="info")
 
 

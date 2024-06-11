@@ -367,7 +367,7 @@ def check_if_regex_string(query: str) -> None | Pattern[str]:
         None | Pattern[str]: _description_
     """
     try:
-        return re.compile(query)
+        return re.compile(rf"{query}")
     except re.error as re_error:
         pprint(re_error)
         return None

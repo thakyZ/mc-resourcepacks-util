@@ -5,13 +5,16 @@
 """_summary_"""
 
 import os
-from argparse import Namespace, ArgumentParser
+from argparse import ArgumentParser
 from pathlib import Path
 from typing import Literal
 
-from mc_resourcepacks_util_shared.library.logger import quit_with_message
+from mc_resourcepacks_util_shared.library.script_arguments import ScriptArguments
+from mc_resourcepacks_util_shared.library.logger import quit_with_message, pprint
 from mc_resourcepacks_util_shared.library.utils import transform_env_variables
 from mc_resourcepacks_util_shared.library.query import parse_files
+from mc_resourcepacks_util_shared.library.resourcepack import ResourcePack
+from mc_resourcepacks_util_shared.library.config_parser import read_from_options
 from mc_resourcepacks_util_shared.library.query_builder import QueryBuilder
 
 
@@ -27,31 +30,31 @@ def main() -> None:
     )
     parser.add_argument(
         "instance", type=str, help="The first target directory."
-    )  # noqa: E241
+    )
     parser.add_argument(
         "query", type=str, help="The relative, full, or partial path to search"
-    )  # noqa: E241
+    )
     parser.add_argument(
         "--resourcepacks",
         "-r",
         dest="query_resourcepacks",
         action="store_true",
         help="Uses the resource packs folder",
-    )  # noqa: E241
+    )
     parser.add_argument(
         "--mods",
         "-m",
         dest="query_mods",
         action="store_true",
         help="Uses the resource packs folder",
-    )  # noqa: E241
+    )
     parser.add_argument(
         "--emissive_check",
         "-e",
         dest="is_emissive_check",
         action="store_true",
         help="Emissive Suffix Consistency Check. Checks to see if all files are matching consistency with the specific query suffix.",
-    )  # noqa: E241
+    )
     parser.add_argument(
         "--instances_dir",
         "--dir",
@@ -59,30 +62,31 @@ def main() -> None:
         dest="instances_dir",
         type=str,
         help="Specifies a custom instances directory.",
-        default="",
-    )  # noqa: E241
+        default=cwd,
+    )
     parser.add_argument(
         "--regex",
         "-R",
         dest="is_regex",
         action="store_true",
         help="Specifies that the query is using regex.",
-    )  # noqa: E241
+    )
+    parser.add_argument(
+        "--only-enabled",
+        "-o",
+        dest="is_enabled_only",
+        action="store_true",
+        help="Specifies to only query enabled packs.",
+    )
 
-    args: Namespace = parser.parse_args()
+    args: ScriptArguments = ScriptArguments(parser.parse_args())
 
     emissive_check: Literal["emissive"] | None = None
-
-    if args.is_emissive_check:
-        emissive_check = "emissive"
-
-    query_builder: QueryBuilder = QueryBuilder(
-        query=args.query, regex=args.is_regex, parameter=emissive_check
-    )
+    enabled_packs: list[str] | None = None
 
     path_one: Path = Path()
 
-    if args.instances_dir != "":
+    if args.instances_dir != cwd:
         instances_dir: str = transform_env_variables(args.instances_dir)
         path_one = Path(instances_dir, args.instance)
     else:
@@ -92,6 +96,14 @@ def main() -> None:
         quit_with_message("The <dir> parameter must exist on path.")
     elif not path_one.is_dir():
         quit_with_message("The <dir> parameter must be a directory.")
+
+    if args.is_emissive_check:
+        emissive_check = "emissive"
+    if args.is_enabled_only:
+        enabled_packs = ResourcePack.to_list_str(read_from_options(args).enabled, True, False)
+
+    query_builder: QueryBuilder = QueryBuilder(query=args.query, regex=args.is_regex,
+                                               parameter=emissive_check, enabled=enabled_packs)
 
     dir_query: list[Path] = []
     ext_query: list[str] = []

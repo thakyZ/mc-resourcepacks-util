@@ -18,7 +18,11 @@ from .constants import command_regex
 
 
 def query_when_or_not_regex(
-    leaf: Path | str, branch: Path | str, trunk: Path | str, query_builder: QueryBuilder, compressed: bool = False
+    leaf: Path | str,
+    branch: Path | str,
+    trunk: Path | str,
+    query_builder: QueryBuilder,
+    compressed: bool = False,
 ) -> None:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
@@ -29,16 +33,34 @@ def query_when_or_not_regex(
         branch (Path | str): _description_
         trunk (Path | str): _description_
         query_builder (QueryBuilder): _description_
-        temp (str | None, optional): _description_. Defaults to None.
+        compressed (bool, optional): _description_. Defaults to False.
     """
-    if re.match(query_builder.query, str(branch)) is not None:
-        if compressed is False:
-            trunk = str(branch).replace(str(leaf), "").removeprefix("/").removeprefix("\\")
-        print_found_query(leaf, trunk, compressed, False)
+    if compressed is False and isinstance(branch, Path):
+        if query_builder.test(
+            branch.as_posix(), resource_pack_item=Path(leaf).parts[-1]
+        ):
+            trunk = (
+                str(branch).replace(str(leaf), "").removeprefix("/").removeprefix("\\")
+            )
+            print_found_query(leaf, trunk, compressed, False)
+    else:
+        if query_builder.test(str(branch), resource_pack_item=Path(leaf).parts[-1]):
+            if compressed is False:
+                trunk = (
+                    str(branch)
+                    .replace(str(leaf), "")
+                    .removeprefix("/")
+                    .removeprefix("\\")
+                )
+            print_found_query(leaf, trunk, compressed, False)
 
 
 def test_match_of_opened_file(
-    directory: Path | str, file: Path | str, line: str, query_builder: QueryBuilder, compressed: bool = False
+    directory: Path | str,
+    file: Path | str,
+    line: str,
+    query_builder: QueryBuilder,
+    compressed: bool = False,
 ) -> None:
     # TODO: Add method summary.
     # TODO: Add description for arguments/raises/returns.
@@ -49,11 +71,17 @@ def test_match_of_opened_file(
         file (Path | str): _description_
         line (str): _description_
         query_builder (QueryBuilder): _description_
+        compressed (bool, optional): _description_. Defaults to False.
     """
     matches: Match[str] | None = re.search(command_regex, line)
-    if matches:
+    if matches is not None:
         if compressed is False:
-            file = str(file).replace(str(directory), "").removeprefix("/").removeprefix("\\")
+            file = (
+                str(file)
+                .replace(str(directory), "")
+                .removeprefix("/")
+                .removeprefix("\\")
+            )
         test: bool = matches.groups()[0] == query_builder.query
         print_found_query_bool(directory, file, test, compressed, False)
 
@@ -77,7 +105,7 @@ def iterate_dir_ext(
             for _sub_file in sub_files:
                 sub_file: Path = Path(_sub_file)
                 if query_builder.is_emissive_check:
-                    if query_builder.patch in f"{sub_file}":
+                    if query_builder.patch in _sub_file:
                         with Path(sub_path, sub_file).open(mode="rb") as opened_file:
                             decoded: str | None = decode_bytes(opened_file.read())
                             if decoded is not None:
@@ -127,16 +155,14 @@ def iterate_file_ext(
                                         decoded: str | None = decode_bytes(
                                             opened_compressed_file.read()
                                         )
-                                        pprint(compressed_file, decoded is not None)
                                         if decoded is not None:
-                                            pprint(len(decoded.splitlines(False)))
                                             for line in decoded.splitlines(False):
-                                                pprint(line)
                                                 test_match_of_opened_file(
                                                     file,
                                                     compressed_file,
                                                     line,
-                                                    query_builder, compressed=True
+                                                    query_builder,
+                                                    compressed=True,
                                                 )
                             else:
                                 query_when_or_not_regex(
@@ -144,7 +170,7 @@ def iterate_file_ext(
                                     compressed_file,
                                     compressed_file,
                                     query_builder,
-                                    True
+                                    compressed=True,
                                 )
                         else:
                             query_when_or_not_regex(
@@ -152,7 +178,7 @@ def iterate_file_ext(
                                 compressed_file,
                                 compressed_file,
                                 query_builder,
-                                True
+                                compressed=True,
                             )
         # pylint: disable-next=W0718
         except BaseException as base_exception:

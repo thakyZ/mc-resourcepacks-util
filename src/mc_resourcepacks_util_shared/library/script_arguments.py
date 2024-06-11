@@ -50,16 +50,22 @@ class ScriptArguments:
 
     def __init__(self, namespace: Namespace) -> None:
         for key, value in namespace.__dict__.items():
+            if key == "instances_dir":
+                self.__setattr__("dir", value)
             self.__setattr__(key, value)
         if (
             self.__contains__("dir")
             and self.dir is not None
             and isinstance(self.dir, str | Path)
         ):
-            self._minecraft_folder: Path = self.__get_minecraft_dir__(self.dir)
-            self._options_file: Path = Path(self.minecraft_folder, "options.txt")
+            self._minecraft_folder: Path = Path()
+            if self.__contains__("instance") and self.instance is not None:
+                self._minecraft_folder = Path(self.dir, self.instance, "minecraft")
+            else:
+                self._minecraft_folder = self.__get_minecraft_dir__(self.dir)
+            self._options_file: Path = Path(self._minecraft_folder, "options.txt")
             self._resourcepacks_folder: Path = Path(
-                self.minecraft_folder, "resourcepacks"
+                self._minecraft_folder, "resourcepacks"
             )
             self._config_folder: Path
             if (

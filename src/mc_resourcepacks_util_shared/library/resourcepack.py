@@ -13,6 +13,9 @@ from .pack_mcmeta import PackMcMeta
 from .utils import escape_config_chars, open_file, try_decode_json_force, unescape_config_chars
 
 
+enabled: list["ResourcePack"] = []
+
+
 class ResourcePack():
     """A resourcepack data class."""
     config_string: str = ""
@@ -138,6 +141,30 @@ class ResourcePack():
         simple_list: list[str] = list(map(add_surrounding_quotes, config_list))
         str_config_list: str = f"[{','.join(simple_list)}]"
         return str_config_list
+
+    @staticmethod
+    def to_list_str(_list: list["ResourcePack"], short: bool = False, raw: bool = True) -> list[str]:
+        # TODO: Add method summary.
+        # TODO: Add description for arguments/raises/returns.
+        """_summary_
+
+        Args:
+            _list (list[&quot;ResourcePack&quot;]): _description_
+            short (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            list[str]: _description_
+        """
+        output: list[str] = []
+        for item in _list:
+            if short is False:
+                if raw is True:
+                    output.append(item.raw_config_string)
+                else:
+                    output.append(item.config_string)
+            else:
+                output.append(item.resourcepack_file.name)
+        return output
 
     @staticmethod
     def load_resource_packs(args: ScriptArguments) -> list["ResourcePack"]:
