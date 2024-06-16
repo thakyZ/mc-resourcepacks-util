@@ -80,6 +80,7 @@ build-backend = "poetry.core.masonry.api"
 include = [
   ".vscode/tasks",
   "src/mc_resourcepacks_util_gui",
+  "src/mc_resourcepacks_util_modify",
   "src/mc_resourcepacks_util_query",
   "src/mc_resourcepacks_util_shared",
   "src/mc_resourcepacks_util_tools",
@@ -96,10 +97,11 @@ reportMissingImports = true
 reportMissingTypeStubs = false
 pythonVersion = "3.12"
 executionEnvironments = [
-  { root = "src/mc_resourcepacks_util_gui",   pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
-  { root = "src/mc_resourcepacks_util_query", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
-  { root = "src/mc_resourcepacks_util_tools", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
-  { root = ".vscode/tasks",                   pythonVersion = "3.12" },
+  { root = "src/mc_resourcepacks_util_gui",    pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_modify", pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_query",  pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = "src/mc_resourcepacks_util_tools",  pythonVersion = "3.12", extraPaths = [ "src/mc_resourcepacks_util_shared" ] },
+  { root = ".vscode/tasks",                    pythonVersion = "3.12" },
   { root = "src" }
 ]
 
