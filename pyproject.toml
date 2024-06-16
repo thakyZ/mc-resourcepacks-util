@@ -26,14 +26,16 @@ homepage = "https://github.com/thakyZ/mc-resourcepacks-util#README"
 documentation = "https://github.com/thakyZ/mc-resourcepacks-util/blob/main/docs/index.md"
 packages = [
   # Shared packager definitions.
-  { include = "mc_resourcepacks_util_shared", from = "src"                            },
+  { include = "mc_resourcepacks_util_shared", from = "src"                              },
   # CLI packager definitions.
-  { include = "mc_resourcepacks_util_query", from = "src", to = "query_resourcepacks" },
-  { include = "mc_resourcepacks_util_query", from = "src"                             },
-  { include = "mc_resourcepacks_util_tools", from = "src", to = "resourcepack_tools"  },
-  { include = "mc_resourcepacks_util_tools", from = "src"                             },
+  { include = "mc_resourcepacks_util_query",  from = "src", to = "query_resourcepacks"  },
+  { include = "mc_resourcepacks_util_query",  from = "src"                              },
+  { include = "mc_resourcepacks_util_modify", from = "src", to = "modify_resourcepacks" },
+  { include = "mc_resourcepacks_util_modify", from = "src"                              },
+  { include = "mc_resourcepacks_util_tools",  from = "src", to = "resourcepack_tools"   },
+  { include = "mc_resourcepacks_util_tools",  from = "src"                              },
   # GUI packager definitions.
-  { include = "mc_resourcepacks_util_gui",   from = "src"                             },
+  { include = "mc_resourcepacks_util_gui",    from = "src"                              },
 ]
 
 [tool.poetry.urls]
@@ -64,6 +66,8 @@ mc-resourcepacks-tools    = "mc_resourcepacks_util_tools.__init__:main"
 resourcepack_tools        = "resourcepack_tools.mc_resourcepacks_util_tools.__init__:main"
 mc-resourcepacks-query    = "mc_resourcepacks_util_query.__init__:main"
 query_resourcepacks       = "query_resourcepacks.mc_resourcepacks_util_query.__init__:main"
+mc-resourcepacks-modify   = "mc_resourcepacks_util_modify.__init__:main"
+modify_resourcepacks      = "modify_resourcepacks.mc_resourcepacks_util_modify.__init__:main"
 mc-resourcepacks-util-gui = "mc_resourcepacks_util_gui.__init__:main"
 resourcepack_tools_gui    = "mc_resourcepacks_util_gui.__init__:main"
 query_resourcepacks_gui   = "mc_resourcepacks_util_gui.__init__:main"
