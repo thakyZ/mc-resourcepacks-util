@@ -4,9 +4,8 @@
 """_summary_"""
 
 import os
-from os import PathLike
 from pathlib import Path
-from typing import Any, Literal, TypeVar, Callable
+from typing import Literal, Callable
 from zipfile import ZipFile
 import json
 
@@ -82,16 +81,16 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
                         pprint(compressed_file)
                         if compressed_file == "pack.mcmeta":
                             decoded: tuple[str | None, str | None] = (None, None)
-                            with zipped_file.open(compressed_file, mode="r", force_zip64=True) as opened_compressed_file:
-                                decoded = decode_bytes_enc(opened_compressed_file.read())
-                                opened_compressed_file.close()
+                            with zipped_file.open(compressed_file, mode="r", force_zip64=True) as cfr:
+                                decoded = decode_bytes_enc(cfr.read())
+                                cfr.close()
                             if decoded[0] is None or decoded[1] is None:
                                 raise FileNotReadError(f"File at the path {compressed_file} in zip file {file} has not been read.")
                             _json: dict[Literal["pack"], dict[Literal["pack_format"] | Literal["description"], str | int]] = json.loads(decoded[0])
                             _json["pack"]["pack_format"] = minecraft_version.pack_version()
                             dump: str = json.dumps(_json, indent=4)
-                            with zipped_file.open(compressed_file, mode="w", force_zip64=True) as opened_compressed_file:
+                            with zipped_file.open(compressed_file, mode="w", force_zip64=True) as cfw:
                                 encoded: bytes | None = encode_bytes(dump, decoded[1])
                                 if encoded is not None:
-                                    opened_compressed_file.write(encoded)
-                                opened_compressed_file.close()
+                                    cfw.write(encoded)
+                                cfw.close()
