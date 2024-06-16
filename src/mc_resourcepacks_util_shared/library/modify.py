@@ -9,6 +9,8 @@ from typing import Literal, Callable
 from zipfile import ZipFile
 import json
 
+from .extensions.zip_data import ZipData
+
 from .errors import FileNotReadError
 
 from .minecraft_version import MinecraftVersion
@@ -76,20 +78,27 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
                 continue
             file_path: Path = Path(root, file)
             if file_path.suffix == ".zip":
+                file_to_modify: list[ZipData] = []
                 with ZipFile(file_path, mode="r", allowZip64=True) as zipped_file:
                     for compressed_file in zipped_file.namelist():
                         if compressed_file == "pack.mcmeta":
                             decoded: tuple[str | None, str | None] = (None, None)
                             with zipped_file.open(compressed_file, mode="r", force_zip64=True) as cfr:
-                                decoded = decode_bytes_enc(cfr.read())
+                                data: bytes = cfr.read()
+                                decoded = decode_bytes_enc(data)
                                 cfr.close()
                             if decoded[0] is None or decoded[1] is None:
                                 raise FileNotReadError(f"File at the path {compressed_file} in zip file {file} has not been read.")
-                            _json: dict[Literal["pack"], dict[Literal["pack_format"] | Literal["description"], str | int]] = json.loads(decoded[0])
-                            _json["pack"]["pack_format"] = minecraft_version.pack_version()
-                            dump: str = json.dumps(_json, indent=4)
-                            with zipped_file.open(compressed_file, mode="w", force_zip64=True) as cfw:
-                                encoded: bytes | None = encode_bytes(dump, decoded[1])
-                                if encoded is not None:
-                                    cfw.write(encoded)
-                                cfw.close()
+                            json_data: dict[Literal["pack"], dict[Literal["pack_format"] | Literal["description"], str | int]] = json.loads(decoded[0])
+                            json_data["pack"]["pack_format"] = minecraft_version.pack_version()
+                            json_text: str = json.dumps(json_data, indent=4)
+                            file_to_modify.append(ZipData(compressed_file, json_text, decoded[1]))
+                with ZipFile(file_path, mode="w", allowZip64=True) as zipped_file:
+                    for compressed_file in zipped_file.namelist():
+                        for file_data in file_to_modify:
+                            if file_data.file == compressed_file:
+                                with zipped_file.open(compressed_file, mode="w", force_zip64=True) as cfw:
+                                    encoded: bytes | None = encode_bytes(file_data.text, file_data.encoding)
+                                    if encoded is not None:
+                                        cfw.write(encoded)
+                                    cfw.close()
