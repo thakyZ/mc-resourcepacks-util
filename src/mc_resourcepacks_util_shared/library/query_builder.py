@@ -8,7 +8,7 @@ import re
 from re import Pattern
 from typing import Literal
 
-from .logger import quit_with_error, pprint
+from .logger import quit_with_error
 from .errors import NotValidRegexError
 
 
@@ -41,10 +41,7 @@ class QueryBuilder:
                 self.query = test
             else:
                 quit_with_error(
-                    NotValidRegexError(
-                        f"The regex pattern, {query} is not a valid regex."
-                    )
-                )
+                    NotValidRegexError(f"The regex pattern, {query} is not a valid regex."))
         else:
             test = check_if_regex_string(re.escape(query))
             if test is not None:
@@ -88,7 +85,7 @@ class QueryBuilder:
         """
         if re.match(self.query, str_to_test):
             if len(self.enabled) > 0:
-                if resource_pack_item is not None and resource_pack_item in self.enabled:
+                if (resource_pack_item is not None and resource_pack_item in self.enabled):
                     return True
                 return False
             return True

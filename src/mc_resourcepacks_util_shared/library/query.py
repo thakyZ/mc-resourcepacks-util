@@ -10,7 +10,7 @@ from re import Match
 from zipfile import ZipFile
 from pathlib import Path
 
-from .logger import pprint, print_found_query_bool, print_found_query, quit_with_error
+from .logger import print_found_query_bool, print_found_query, quit_with_error
 from .query_builder import QueryBuilder
 from .utils import decode_bytes
 from .dir_file_utils import walk_and_talk, walk_level
@@ -142,9 +142,7 @@ def iterate_file_ext(
         file: Path = Path(path, _file)
         try:
             if file.suffix == file_ext and path == base_directory:
-                with ZipFile(
-                    Path(path, file), mode="r", allowZip64=True
-                ) as zipped_file:
+                with ZipFile(Path(path, file), mode="r", allowZip64=True) as zipped_file:
                     for compressed_file in zipped_file.namelist():
                         if not os.path.isdir(compressed_file):
                             if query_builder.is_emissive_check:

@@ -13,6 +13,16 @@ class NotValidRegexError(Exception):
     """
 
 
+class FileNotReadError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Args:
+        Exception (_type_): _description_
+    """
+
+
 class EnvironmentVariableNotFoundError(Exception):
     # TODO: Add class summary.
     # TODO: Add description for arguments/raises/returns.

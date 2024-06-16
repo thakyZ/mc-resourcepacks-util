@@ -140,9 +140,7 @@ def get_enabled_resourcepacks(args: ScriptArguments) -> list[ResourcePack]:
         list[ResourcePack]: _description_.
     """
     enabled: list[ResourcePack] = []
-    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(
-        mode="r+", encoding="utf8"
-    ) as enabled_file:
+    with Path(os.path.realpath(args.compile_dir), "enabled.txt").open(mode="r+", encoding="utf8") as enabled_file:
         for item in enabled_file.readlines():
             new_item: str = item.replace("\n", "")
             if new_item != "" and list_has(enabled, item):
@@ -151,9 +149,7 @@ def get_enabled_resourcepacks(args: ScriptArguments) -> list[ResourcePack]:
     return enabled
 
 
-def compile_resourcepacks(
-    args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]
-) -> None:
+def compile_resourcepacks(args: ScriptArguments, enabled: list[ResourcePack], incompatible: list[ResourcePack]) -> None:
     """Compiles all resource packs in the ``<dir>/../resource_packs/*.txt`` file into the ``<dir>/options.txt`` file.
 
     Args:

@@ -398,3 +398,46 @@ def decode_bytes(value: bytes | bytearray) -> str | None:
     except BaseException as base_exception:
         pprint(base_exception)
         return None
+
+
+def decode_bytes_enc(value: bytes | bytearray) -> tuple[str | None, str | None]:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Args:
+        value (bytes | bytearray): _description_
+
+    Returns:
+        str | None: _description_
+    """
+    try:
+        encoding: str | None = detect(value)["encoding"]
+        if encoding is None:
+            return (None, None)
+        decode: str = codecs.decode(value, encoding, "strict")
+        return (decode, encoding)
+    # pylint: disable-next=W0718
+    except BaseException as base_exception:
+        pprint(base_exception)
+        return (None, None)
+
+
+def encode_bytes(value: str, encoding: str = "utf-8") -> bytes | None:
+    # TODO: Add method summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Args:
+        value (bytes | bytearray): _description_
+
+    Returns:
+        str | None: _description_
+    """
+    try:
+        encode: bytes = codecs.encode(value, encoding, "strict")
+        return encode
+    # pylint: disable-next=W0718
+    except BaseException as base_exception:
+        pprint(base_exception)
+        return None
