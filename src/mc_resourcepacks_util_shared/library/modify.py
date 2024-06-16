@@ -78,7 +78,6 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
             if file_path.suffix == ".zip":
                 with ZipFile(file_path, mode="r", allowZip64=True) as zipped_file:
                     for compressed_file in zipped_file.namelist():
-                        pprint(compressed_file)
                         if compressed_file == "pack.mcmeta":
                             decoded: tuple[str | None, str | None] = (None, None)
                             with zipped_file.open(compressed_file, mode="r", force_zip64=True) as cfr:
