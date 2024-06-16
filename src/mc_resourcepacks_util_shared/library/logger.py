@@ -12,6 +12,7 @@ from re import Match, Pattern
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal, Union, Iterable, NoReturn
+import json as _json
 
 from rich import inspect
 from rich.prompt import Prompt as RichPrompt, PromptError
@@ -311,3 +312,34 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool, com
         f"[blue]{new_file_path}[/blue] -> [green]{new_path}[/green] [white bold]([/white bold]{tested}[white bold])[/white bold]",
         level="info",
     )
+
+
+def _format_json_colors(text: str) -> str:
+    """_summary_
+
+    Args:
+        text (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    output: str = text.replace("{", "[orange]{[/orange]").replace("}", "[orange]}[/orange]").replace("[", "[orange][[/orange]").replace("]", "[orange]][/orange]").replace(":", "[white]:[/white]").replace(",", "[white]}[/white]")
+    output = re.compile(r"(\/\*[\s\S]*?(?=\*\/)\*\/)").sub(text, r"[gray]\1[/gray]")
+    output = re.compile(r"(\/\/.+)$").sub(text, r"[gray]\1[/gray]")
+    output = re.compile(r"(?<=: ?)(null|\d+)").sub(text, r"[gray]\1[/gray]")
+    return output
+
+
+def print_json(json: str | dict[str, Any]) -> None:
+    # TODO: Add description for method.
+    """_summary_
+
+    Args:
+        json (str | dict[str, Any]): _description_
+    """
+    if isinstance(json, str):
+        # text: str = _format_json_colors(json)
+        pprint(json, level="info")
+    if isinstance(json, dict):
+        pprint("JSON:", level="info")
+        inspect(json)

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Literal, Callable
 from zipfile import ZipFile
 import json
+from json.decoder import JSONDecodeError
 
 from .extensions.zip_data import ZipData
 
@@ -17,7 +18,7 @@ from .minecraft_version import MinecraftVersion
 
 from .utils import decode_bytes_enc, encode_bytes
 
-from .logger import pprint
+from .logger import pprint, quit_with_error, print_json
 from .script_arguments import ScriptArguments
 
 
@@ -89,10 +90,16 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
                                 cfr.close()
                             if decoded[0] is None or decoded[1] is None:
                                 raise FileNotReadError(f"File at the path {compressed_file} in zip file {file} has not been read.")
-                            json_data: dict[Literal["pack"], dict[Literal["pack_format"] | Literal["description"], str | int]] = json.loads(decoded[0])
-                            json_data["pack"]["pack_format"] = minecraft_version.pack_version()
-                            json_text: str = json.dumps(json_data, indent=4)
-                            file_to_modify.append(ZipData(compressed_file, json_text, decoded[1]))
+                            try:
+                                json_data: dict[Literal["pack"], dict[Literal["pack_format"] | Literal["description"], str | int]] = json.loads(decoded[0])
+                                pack_version = minecraft_version.pack_version()
+                                if json_data["pack"]["pack_format"] != pack_version:
+                                    json_data["pack"]["pack_format"] = pack_version
+                                    json_text: str = json.dumps(json_data, indent=4)
+                                    file_to_modify.append(ZipData(compressed_file, json_text, decoded[1]))
+                            except JSONDecodeError as json_decode_error:
+                                print_json(decoded[0])
+                                quit_with_error(json_decode_error)
                 with ZipFile(file_path, mode="w", allowZip64=True) as zipped_file:
                     for compressed_file in zipped_file.namelist():
                         for file_data in file_to_modify:
