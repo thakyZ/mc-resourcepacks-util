@@ -314,22 +314,6 @@ def print_found_query_bool(_file: str | Path, _path: str | Path, test: bool, com
     )
 
 
-def _format_json_colors(text: str) -> str:
-    """_summary_
-
-    Args:
-        text (str): _description_
-
-    Returns:
-        str: _description_
-    """
-    output: str = text.replace("{", "[orange]{[/orange]").replace("}", "[orange]}[/orange]").replace("[", "[orange][[/orange]").replace("]", "[orange]][/orange]").replace(":", "[white]:[/white]").replace(",", "[white]}[/white]")
-    output = re.compile(r"(\/\*[\s\S]*?(?=\*\/)\*\/)").sub(text, r"[gray]\1[/gray]")
-    output = re.compile(r"(\/\/.+)$").sub(text, r"[gray]\1[/gray]")
-    output = re.compile(r"(?<=: ?)(null|\d+)").sub(text, r"[gray]\1[/gray]")
-    return output
-
-
 def print_json(json: str | dict[str, Any]) -> None:
     # TODO: Add description for method.
     """_summary_

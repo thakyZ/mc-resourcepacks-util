@@ -9,6 +9,7 @@ from typing import Any, Callable
 from zipfile import ZipFile
 import json
 from json.decoder import JSONDecodeError
+import tempfile
 
 from .extensions.zip_data import ZipData
 
@@ -79,33 +80,37 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
                 continue
             file_path: Path = Path(root, file)
             if file_path.suffix == ".zip":
-                file_to_modify: list[ZipData] = []
-                with ZipFile(file_path, mode="r", allowZip64=True) as zipped_file:
-                    for compressed_file in zipped_file.namelist():
-                        if compressed_file == "pack.mcmeta":
-                            decoded: tuple[str | None, str | None] = (None, None)
-                            with zipped_file.open(compressed_file, mode="r", force_zip64=True) as cfr:
-                                data: bytes = cfr.read()
-                                decoded = decode_bytes_enc(data)
-                                cfr.close()
-                            if decoded[0] is None or decoded[1] is None:
-                                raise FileNotReadError(f"File at the path {compressed_file} in zip file {file} has not been read.")
-                            try:
-                                json_data: dict[str, Any] = try_decode_json_force(decoded[0])
-                                pack_version = minecraft_version.pack_version()
-                                if json_data["pack"]["pack_format"] != pack_version:
-                                    json_data["pack"]["pack_format"] = pack_version
-                                    json_text: str = json.dumps(json_data, indent=4)
-                                    file_to_modify.append(ZipData(compressed_file, json_text, decoded[1]))
-                            except JSONDecodeError as json_decode_error:
-                                print_json(decoded[0])
-                                quit_with_error(json_decode_error)
-                with ZipFile(file_path, mode="w", allowZip64=True) as zipped_file:
-                    for compressed_file in zipped_file.namelist():
-                        for file_data in file_to_modify:
-                            if file_data.file == compressed_file:
-                                with zipped_file.open(compressed_file, mode="w", force_zip64=True) as cfw:
-                                    encoded: bytes | None = encode_bytes(file_data.text, file_data.encoding)
-                                    if encoded is not None:
-                                        cfw.write(encoded)
-                                    cfw.close()
+                tmp: tuple[int, str] = tempfile.mkstemp(dir=root)
+                os.close(tmp[0])
+                tmp_file: Path = Path(root, tmp[1])
+                success: bool = False
+                with ZipFile(file_path, mode="r", allowZip64=True) as z_in:
+                    with ZipFile(tmp_file, mode="w", allowZip64=True) as z_out:
+                        for item in z_in.infolist():
+                            if item.filename == "pack.mcmeta":
+                                decoded: tuple[str | None, str | None] = (None, None)
+                                cfr: bytes = z_in.read(item.filename)
+                                decoded = decode_bytes_enc(cfr)
+                                if decoded[0] is None or decoded[1] is None:
+                                    raise FileNotReadError(f"File at the path {item.filename} in zip file {file_path} has not been read.")
+                                try:
+                                    json_data: dict[str, Any] = try_decode_json_force(decoded[0])
+                                    pack_version = minecraft_version.pack_version()
+                                    if json_data["pack"]["pack_format"] != pack_version:
+                                        json_data["pack"]["pack_format"] = pack_version
+                                        json_text: str = json.dumps(json_data, indent=4)
+                                        cfw: bytes | None = encode_bytes(json_text, decoded[1])
+                                        if cfw is not None:
+                                            z_out.writestr(item, cfw)
+                                            success = True
+                                except JSONDecodeError as json_decode_error:
+                                    print_json(decoded[0])
+                                    quit_with_error(json_decode_error)
+                if success:
+                    test: bool = True
+                    # replace with the temp archive
+                    if not test:
+                        os.remove(file_path)
+                    else:
+                        os.rename(file_path, file_path.with_name(f"{file_path.name}.bak"))
+                    os.rename(tmp_file, file_path)
