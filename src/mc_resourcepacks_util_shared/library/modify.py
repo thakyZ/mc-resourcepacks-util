@@ -104,8 +104,11 @@ def modify_resourcepacks(args: ScriptArguments, minecraft_version: MinecraftVers
                                             z_out.writestr(item, cfw)
                                             success = True
                                 except JSONDecodeError as json_decode_error:
-                                    print_json(decoded[0])
+                                    z_in.close()
+                                    z_out.close()
                                     quit_with_error(json_decode_error)
+                        z_in.close()
+                    z_out.close()
                 if success:
                     test: bool = True
                     # replace with the temp archive
