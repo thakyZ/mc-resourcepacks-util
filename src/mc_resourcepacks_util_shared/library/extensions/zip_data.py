@@ -17,6 +17,14 @@ class ZipData():
         else:
             self.encoding = "utf-8"
 
+    def is_valid(self) -> bool:
+        """_summary_
+
+        Returns:
+            bool: _description_
+        """
+        return (((isinstance(self.file, str) and self.file != "") or (isinstance(self.file, Path) and self.file.exists())) and self.text != "" and self.encoding != "")
+
     @property
     def text(self) -> str:
         # TODO: Add method docstring.
@@ -76,3 +84,35 @@ class ZipData():
             value (str): _description_
         """
         self._encoding: str = value
+
+
+class ZipDataInvalidError(Exception):
+    # TODO: Add class summary.
+    # TODO: Add description for arguments/raises/returns.
+    """_summary_
+
+    Args:
+        Exception (_type_): _description_
+    """
+    def __init__(self, msg: str, data: ZipData, *args: object) -> None:
+        super().__init__(msg, args)
+        self.add_note(self.get_note_str(data))
+
+    def get_note_str(self, data: ZipData) -> str:
+        """_summary_
+
+        Args:
+            data (ZipData): _description_
+
+        Returns:
+            str: _description_
+        """
+
+        sb: str = f"typeof data.file   = {type(data.file)}\n"
+        if isinstance(data.file, str):
+            sb += f"data.file == \"\"    = {data.file == ""}\n"
+        else:
+            sb += f"data.file.exists() = {data.file.exists()}\n"
+        sb += f"data.text == \"\"    = {data.text == ""}\n"
+        sb += f"data.encoding      = {data.encoding}"
+        return sb

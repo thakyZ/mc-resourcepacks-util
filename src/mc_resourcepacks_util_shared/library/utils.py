@@ -226,8 +226,11 @@ def open_file(
     return decoded_file_stream
 
 
-_LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(
+_EXTRA_DATA_LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(
     r"Extra data: line (\d+) column (\d+) \(char (\d+)\)$", re.MULTILINE
+)
+_EXPECTING_VALUE_LINE_COLUMN_CHAR_REGEX: Pattern[str] = re.compile(
+    r"Expecting value: line (\d+) column (\d+) \(char (\d+)\)$", re.MULTILINE
 )
 _MULTI_LINE_ENSURE_REGEX: Pattern[str] = re.compile(
     r"^(?: |\t)*\"[^\r\n]+\": \"((?:[^\b\"]|\\.\r?\n)*)\",?$", re.MULTILINE
@@ -261,25 +264,65 @@ def try_decode_json_force(data: str) -> dict[str, Any]:
                 cloned_data = cloned_data.replace(group, new_string)
         return cloned_data
 
-    def remove_extra_data(data: str, extra_data_position: int) -> dict[str, Any]:
+    def remove_extra_data(data: str, extra_data_position: int) -> str:
         cloned_data: str = ""
         for index, line in enumerate(data.splitlines(True)):
             if index >= extra_data_position - 1:
                 break
             cloned_data += line
-        return json.loads(cloned_data)
+        return cloned_data
 
+    def remove_extra_value(data: str, extra_data_position: int) -> str:
+        return data
+
+    def remove_ex_value(data: str, error_msg: str) -> str:
+        output: str = ""
+        ex_value_exception_msg: Match[str] | None = _EXPECTING_VALUE_LINE_COLUMN_CHAR_REGEX.search(error_msg)
+        if ex_value_exception_msg is not None:
+            output = remove_extra_value(data, int(ex_value_exception_msg.groups()[0]))
+            try:
+                output = json.loads(data)
+            except JSONDecodeError as json_decoder_error:
+                _error_msg: str = str(json_decoder_error)
+                if "Extra data: " not in _error_msg:
+                    output = remove_ex_data(data, _error_msg)
+                elif "Expecting value: " not in _error_msg:
+                    output = remove_ex_value(data, _error_msg)
+                else:
+                    pprint(data)
+                    raise json_decoder_error
+        return output
+
+    def remove_ex_data(data: str, error_msg: str) -> str:
+        output: str = ""
+        ex_data_exception_msg: Match[str] | None = _EXTRA_DATA_LINE_COLUMN_CHAR_REGEX.search(error_msg)
+        if ex_data_exception_msg is not None:
+            output = remove_extra_data(data, int(ex_data_exception_msg.groups()[0]))
+            try:
+                output = json.loads(tmp_ensured)
+            except JSONDecodeError as json_decoder_error:
+                _error_msg: str = str(json_decoder_error)
+                if "Extra data: " not in _error_msg:
+                    output = remove_ex_data(data, _error_msg)
+                elif "Expecting value: " not in _error_msg:
+                    output = remove_ex_value(data, _error_msg)
+                else:
+                    pprint(data)
+                    raise json_decoder_error
+        return output
+
+    tmp_ensured: str = ""
     try:
-        tmp_ensured: str = ensure_single_line_json_string(data)
+        tmp_ensured = ensure_single_line_json_string(data)
         output = json.loads(tmp_ensured)
     except JSONDecodeError as json_decoder_error:
         error_msg: str = str(json_decoder_error)
-        if "Extra data: " not in error_msg:
-            raise json_decoder_error
-        exception_msg: Match[str] | None = _LINE_COLUMN_CHAR_REGEX.search(error_msg)
-        if exception_msg is None:
-            raise json_decoder_error
-        output = remove_extra_data(data, int(exception_msg.groups()[0]))
+        try:
+            tmp_ensured = remove_ex_data(tmp_ensured, error_msg)
+            output = json.loads(tmp_ensured)
+        except JSONDecodeError as _json_decoder_error:
+            print("tmp_ensured: \"", tmp_ensured, "\"")
+            raise _json_decoder_error
     except Exception as exception:
         raise exception
     except BaseException as base_exception:
